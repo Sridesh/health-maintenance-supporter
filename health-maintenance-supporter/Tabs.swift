@@ -5,7 +5,7 @@
 //  Created by Sridesh 001 on 2025-09-02.
 //
 
-import SwiftUI;
+import SwiftUI
 import SwiftData
 
 struct TabsView: View {
@@ -32,12 +32,13 @@ struct TabsView: View {
 
                 
 //                ClassificationWithVisionView()
-                ClassifierView()
+                HealthView()
 //                    .environmentObject(authentication)
                     .environmentObject(foodItemViewModel)
                     .tabItem {
                         Label("Profile", systemImage: "person.circle")
                     }
+                
                 
               
             }.background(Color.clear)
