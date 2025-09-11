@@ -17,22 +17,27 @@ struct TabsView: View {
     var body: some View {
         
         ZStack{
-            Color.red.ignoresSafeArea()
+//            Color.red.ignoresSafeArea()
             
             TabView {
                 
                 DashboardView().environmentObject(mealViewModel).tabItem{Label("Home", systemImage:"house")}
-                
-                AddMeal().environmentObject(foodItemViewModel).tabItem{
-                    Label("Add Meal", systemImage: "camera")
-                }
+//                
+//                AddMeal().environmentObject(foodItemViewModel).tabItem{
+//                    Label("Add Meal", systemImage: "camera")
+//                }
                 InsightsView().tabItem{
                     Label("Insights", systemImage: "chart.bar.horizontal.page")
                 }
-
+                
+                HealthView()
+                    .tabItem{
+                        Label("Activity", systemImage: "figure.walk")
+                    }
+                
                 
 //                ClassificationWithVisionView()
-                HealthView()
+                ProfileView()
 //                    .environmentObject(authentication)
                     .environmentObject(foodItemViewModel)
                     .tabItem {
@@ -41,7 +46,7 @@ struct TabsView: View {
                 
                 
               
-            }.background(Color.clear)
+            }.background(Color.white)
         }
     }
 }
