@@ -17,85 +17,55 @@ struct StepData: Identifiable {
 struct HealthView: View {
     
     let data: [StepData] = [
-           StepData(day: "Mon", steps: 5000),
-           StepData(day: "Tue", steps: 7500),
-           StepData(day: "Wed", steps: 9000),
-           StepData(day: "Thu", steps: 6500),
-           StepData(day: "Fri", steps: 10000),
-           StepData(day: "Sat", steps: 12000),
-           StepData(day: "Sun", steps: 8000),
-       ]
-       
+        StepData(day: "Mon", steps: 5000),
+        StepData(day: "Tue", steps: 7500),
+        StepData(day: "Wed", steps: 9000),
+        StepData(day: "Thu", steps: 6500),
+        StepData(day: "Fri", steps: 10000),
+        StepData(day: "Sat", steps: 12000),
+        StepData(day: "Sun", steps: 8000),
+    ]
+    
     
     @StateObject private var healthStore = HealthStore()
-//    let formatter = DateFormatter()
-//    formatter.dateFormat = "MMMM d, yyyy"  // Full month name
-//    let todayString = formatter.string(from: Date())
-        
-        var body: some View {
-            ZStack{
-                VStack{
+    
+    var body: some View {
+        ZStack{
+            //background
+            LinearGradient(
+                gradient: Gradient(colors: [Color(.systemBlue).opacity(0.13), Color(.systemPurple).opacity(0.10)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            
+            
+            VStack(spacing: 20) {
+                HStack{
+
                     VStack{
-                        
-                    }.frame(maxWidth: .infinity)
-                        .frame(height:150)
-                        .background(
-                            LinearGradient(colors: [.blue.opacity(0.15), .purple.opacity(0.15)], startPoint: .leading , endPoint: .trailing)
-                        )
-                } .frame(maxHeight: .infinity, alignment: .top)
-                VStack(spacing: 20) {
-                    HStack{
-                        
-                        Image(systemName: "figure.walk")
-                            .foregroundColor(Color.white)
-                            .padding(6)
-                            .frame(width: 30)
-                            .background(
-                                LinearGradient(colors: [.blue, .purple], startPoint: .topLeading , endPoint: .bottomTrailing)
-                            )
-                            .cornerRadius(5)
-                        
-                        
-                        
-                        VStack{
-                            Text("Your Activity Today")
-                                .font(.headline)
-                            //                      Text("Date•\(Date(), formatter: {
-                            Text("Date • ").font(.caption) +
-                            Text(Date(), formatter: {
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM d, yyyy"
-                                return formatter
-                            }()).font(.caption)
-                            
-                        }
-                    }.frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Your Activity Today")
+                            .font(.headline)
+                            .padding(.top)
+                            .padding(.horizontal, 30)
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    VStack {
-                        //                        Image("steps")
-                        //                            .resizable()
-                        //                            .frame(width: 40, height: 40)
-                        //
-                        //                        Text("Steps:").font(.headline)
-                        //                        Spacer()
-                        //                        Text("\(Int(healthStore.steps))")
-                        
+                
+                
+                ScrollView{
+                    //content
+                    VStack(spacing: 15){
+                    GlassCard {
                         HStack{
-                            
                             Image(systemName: "flame")
                                 .foregroundColor(Color.white)
                                 .padding(6)
                                 .frame(width: 30)
                                 .background(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .cyan]),
+                                        gradient: Gradient(colors: [.blue, .purple]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -122,12 +92,12 @@ struct HealthView: View {
                         ZStack(alignment: .leading) {
                             Rectangle()
                                 .frame( width: 340,height: 7)
-                                .foregroundColor(Color.gray.opacity(0.2))
+                                .foregroundColor(Color.gray.opacity(0.3))
                                 .cornerRadius(4)
                             Rectangle()
                                 .fill(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .cyan]),
+                                        gradient: Gradient(colors: [.blue, .purple]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -136,22 +106,18 @@ struct HealthView: View {
                                 .cornerRadius(4)
                             
                         }.frame(height: 7)
+                            .padding(.top)
                         
                         HStack{
-                            Text("At rest: ").font(.caption).font(.caption).foregroundColor(Color.gray) +
-                            Text("\(Int(healthStore.activeCalories)) kcal").font(.caption).bold()
+                            Text("At rest: ").font(.caption).font(.system(size: 15)).foregroundColor(Color.gray) +
+                            Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
                             
                             Spacer()
                             
-                            Text("From activity: ").font(.caption).foregroundColor(Color.gray) + Text("\(Int(healthStore.activeCalories)) kcal").font(.caption).bold()
-                        }
+                            Text("From activity: ").font(.system(size: 15)).foregroundColor(Color.gray) + Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
+                        }.padding(.top,3)
                     }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(color:Color.gray.opacity(0.2),radius: 10)
-                    
-                    
+
                     HStack{
                         VStack {
                             Image("walking")
@@ -159,13 +125,13 @@ struct HealthView: View {
                                 .frame(width: 180, height: 110)
                             
                             VStack{
-                                Text("Step Count:").font(.headline).padding(.bottom, 3)
+                                Text("Step Count:").font(.headline)
                                 Text("\(Int(healthStore.steps))").font(.title2)
                             }.padding(.vertical,3)
                         }
-                        .background(Color.white)
+                        .background(Color.white.opacity(0.5))
                         .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.2),radius: 10)
+                        .shadow(color:Color.gray.opacity(0.3),radius: 10)
                         Spacer()
                         
                         VStack {
@@ -174,87 +140,86 @@ struct HealthView: View {
                                 .frame(width: 180, height: 110)
                             
                             VStack{
-                                Text("Flights Climbed:").font(.headline).padding(.bottom, 3)
+                                Text("Flights Climbed:").font(.headline)
                                 Text("\(Int(healthStore.flights))").font(.title2)
                             }.padding(.vertical,3)
                         }
-                        .background(Color.white)
+                        .background(Color.white.opacity(0.5))
                         .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.2),radius: 10)
+                        .shadow(color:Color.gray.opacity(0.3),radius: 10)
                         
                         
                         
+                    }            
+                    
+                    GlassCard{
+                        HStack {
+                            Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+                                .foregroundColor(Color.white)
+                                .padding(6)
+                                .frame(width: 30)
+                                .background(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(5)
+                            
+                            Text("Distance:").font(.headline)
+                            Spacer()
+                            Text(String(format: "%.2f km", healthStore.distance / 1000)) // meters → km
+                        }
                     }
                     
-                    
-                    HStack {
-                        Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                            .foregroundColor(Color.white)
-                            .padding(6)
-                            .frame(width: 30)
-                            .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.appPrimary, Color.appSecondary]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(5)
-                        
-                        Text("Distance:").font(.headline)
-                        Spacer()
-                        Text(String(format: "%.2f km", healthStore.distance / 1000)) // meters → km
-                    }.padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.2),radius: 10)
-                    
-                    VStack{
+                    GlassCard{
                         Chart {
-                                   ForEach(data) { point in
-                                       LineMark(
-                                           x: .value("Day", point.day),
-                                           y: .value("Steps", point.steps)
-                                       )
-                                       .interpolationMethod(.catmullRom) // smooth curve
-                                       .foregroundStyle(
-                                           LinearGradient(
-                                               colors: [.blue, .purple],
-                                               startPoint: .leading,
-                                               endPoint: .trailing
-                                           )
-                                       )
-                                       
-                                       // Optional: Fill under the line with gradient
-                                       AreaMark(
-                                           x: .value("Day", point.day),
-                                           y: .value("Steps", point.steps)
-                                       )
-                                       .interpolationMethod(.catmullRom)
-                                       .foregroundStyle(
-                                           LinearGradient(
-                                               gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]),
-                                               startPoint: .top,
-                                               endPoint: .bottom
-                                           )
-                                       )
-                                   }
-                               }
-                               .frame(height: 200)
-                               .padding()
+                            ForEach(data) { point in
+                                LineMark(
+                                    x: .value("Day", point.day),
+                                    y: .value("Steps", point.steps)
+                                )
+                                .interpolationMethod(.catmullRom) // smooth curve
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.blue, .purple],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                
+                                // Optional: Fill under the line with gradient
+                                AreaMark(
+                                    x: .value("Day", point.day),
+                                    y: .value("Steps", point.steps)
+                                )
+                                .interpolationMethod(.catmullRom)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                            }
+                        }
+                        .frame(height: 200)
+                        .padding()
                         
-                    }.background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.2),radius: 10)
+                    }
+                    }.padding(.horizontal, 20)
                 }
                 
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding()
-//                .background(Color(hex: "#fff1ed"))
-              
+                .frame(height: 730)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
+            .padding(.vertical)
+            //                .background(Color(hex: "#fff1ed"))
             
         }
+        
+    }
 }
 
 #Preview {

@@ -35,10 +35,10 @@ struct FoodIntake:View {
                     Text("\(totalCalories)kcal").frame(maxWidth: .infinity, alignment: .leading).font(.caption)
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
-                Button("View", systemImage: "plus"){
+                Button("View"){
                     mealViewModel.changeMeal(meal: title)
                     mealViewModel.mealWindowOpen = true
-                }.padding(10).background(Color(hex: "#ff724c")).cornerRadius(50).foregroundColor(.white)
+                }.padding(10).foregroundColor(Color(hex: "#ff724c")).cornerRadius(50).bold()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading).padding(20)
