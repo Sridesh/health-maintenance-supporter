@@ -12,9 +12,12 @@ struct FaceIDCollectionView: View {
     
     var body: some View {
         VStack(alignment: .leading){
-            Text("Logging in \(session.user?.gender)").foregroundColor(Color(hex: "#ff724c"))
-            Text("We use Face ID to log you into our application")
-                .foregroundColor(Color(hex: "#ff724c")).opacity(0.5)
+            LinearGradient(
+                gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
         }.frame(maxHeight: .infinity, alignment: .top)
     }
 }
