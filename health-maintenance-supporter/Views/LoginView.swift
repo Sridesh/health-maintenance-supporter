@@ -34,13 +34,12 @@ struct SignInView: View {
                         .scaledToFit()
                         .frame(width:150, height: 150)
                     
-                    // Glassmorphism Card
+           
                     VStack(spacing: 20) {
                         Text("Welcome Back")
                             .font(.largeTitle.bold())
                             .foregroundColor(Color.appPrimary)
-                        
-                        // Email Field
+             
                         TextField("Email", text: $email)
                             .keyboardType(.emailAddress)
                             .autocapitalization(.none)
@@ -48,8 +47,7 @@ struct SignInView: View {
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
                             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
                             .foregroundColor(.white)
-                        
-                        // Password Field
+                   
                         HStack {
                             if isSecure {
                                 SecureField("Password", text: $password)
@@ -85,7 +83,6 @@ struct SignInView: View {
                             Alert(title: Text("Login"), message: Text("Invalid email or password"), dismissButton: .default(Text("Try Again")))
                         }
                         
-                        // Forgot Password
                         Button("Forgot Password?") {}
                             .font(.footnote)
                             .foregroundColor(Color.appText)
@@ -95,11 +92,10 @@ struct SignInView: View {
                         //                        .padding(.vertical)
                         
                         Button(action: {
-                            // Handle login logic here
                             showAlert = true
                         }) {
                             HStack {
-                                Image(systemName: "faceid")   // SF Symbol
+                                Image(systemName: "faceid")
                                     .font(.title)
                                     .padding(.trailing)
                                 Text("Face ID")
@@ -109,7 +105,7 @@ struct SignInView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .stroke(Color.appSecondary, lineWidth: 4) // Border with rounded corners
+                                    .stroke(Color.appSecondary, lineWidth: 4)
                             )
                             .foregroundColor(Color.appSecondary)
                         }
@@ -137,7 +133,6 @@ struct SignInView: View {
                     
                     
                     Spacer()
-                    // Sign Up Link
                     HStack {
                         Text("Don't have an account?")
                             .foregroundColor(Color.appText.opacity(0.7))

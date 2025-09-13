@@ -8,8 +8,10 @@
 import SwiftUI
 
 extension Color {
-    static let appPrimary = Color(hex:"#303256")
-    static let appSecondary = Color(hex: "#71759e")
+    static let appPrimary = Color(hex:"#555995")
+//    static let appPrimary = Color(hex:"#303256")#444666
+//    static let appSecondary = Color(hex: "#71759e")#7679ac
+    static let appSecondary = Color(hex: "#7679ac")
     static let appText = Color(hex: "#080424")
     static let appYellow = Color(hex: "#ccb999")
     static let appBlue = Color(hex: "#a1d0e3")

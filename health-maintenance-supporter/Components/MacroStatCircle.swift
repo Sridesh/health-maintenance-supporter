@@ -19,20 +19,20 @@ struct MacroStat: View {
 //                    .fill(color)
 //                    .frame(width: 10, height: 10)
                 Text(name)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.appSecondary)
             }
             ZStack(alignment: .leading) {
                 Capsule()
                     .fill(Color.blue.opacity(0.12))
                     .frame(height: 8)
                 Capsule()
-                    .fill(LinearGradient(colors: [Color.purple, Color.blue], startPoint: .leading, endPoint: .trailing))
+                    .fill(LinearGradient(colors: [Color.appPrimary, Color.appSecondary], startPoint: .leading, endPoint: .trailing))
                     .frame(width: CGFloat(min(value/goal, 1)) * 60, height: 8)
             }
             .frame(width: 60)
             Text("\(Int(value))/\(Int(goal))")
                 .font(.system(size: 16))
-                .foregroundColor(.primary)
+                .foregroundColor(Color.appText)
         }
         .frame(width: 70)
     }

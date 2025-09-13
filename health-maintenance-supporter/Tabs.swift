@@ -12,9 +12,12 @@ struct TabsView: View {
     @EnvironmentObject var authentication : AuthenticationViewModel
     @EnvironmentObject var mealViewModel: MealsViewModel
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var goalViewModel: GoalsViewModel
     
     @State private var selectedTab = 0
     var body: some View {
+        
         
         ZStack{
             LinearGradient(
@@ -27,13 +30,18 @@ struct TabsView: View {
             
             TabView {
                 DashboardView()
+                    .environmentObject(goalViewModel)
+                    .environmentObject(userViewModel)
                     .environmentObject(mealViewModel)
                     .tabItem{Label("Home", systemImage:"house")}
 
                 InsightsView()
+                    .environmentObject(goalViewModel)
+                    .environmentObject(userViewModel)
                     .tabItem{Label("Insights", systemImage: "chart.bar.horizontal.page")}
                 
                 HealthView()
+                    .environmentObject(goalViewModel)
                     .tabItem{Label("Activity", systemImage: "figure.walk")}
                 
 //                SignupView()

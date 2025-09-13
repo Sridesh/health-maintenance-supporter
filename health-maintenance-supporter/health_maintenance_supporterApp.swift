@@ -16,6 +16,7 @@ struct health_maintenance_supporterApp: App {
         @StateObject private var mealViewModel: MealsViewModel
         @StateObject private var foodItemViewModel: FoodItemViewModel
         @StateObject private var userViewModel: UserViewModel
+    @StateObject private var goalViewModel: GoalsViewModel
         
         let container: ModelContainer
 
@@ -26,7 +27,8 @@ struct health_maintenance_supporterApp: App {
         _authViewModel = StateObject(wrappedValue: AuthenticationViewModel(context: modelContainer.mainContext))
         _mealViewModel = StateObject(wrappedValue: MealsViewModel(context: modelContainer.mainContext))
         _foodItemViewModel = StateObject(wrappedValue: FoodItemViewModel(context: modelContainer.mainContext))
-        _userViewModel = StateObject(wrappedValue: UserViewModel())  // <-- fixed
+        _userViewModel = StateObject(wrappedValue: UserViewModel())
+        _goalViewModel = StateObject(wrappedValue: GoalsViewModel())
         
         FirebaseApp.configure()
     }
@@ -34,9 +36,11 @@ struct health_maintenance_supporterApp: App {
     var body: some Scene {
         WindowGroup {
             VStack{
-                if authViewModel.userSessionLogged {
-                    if authViewModel.isAuthenticated {
+                if authViewModel.userSessionLogged && userViewModel.userOnboarded {
+                    if authViewModel.isAuthenticated  {
                         TabsView()
+                            .environmentObject(goalViewModel)
+                            .environmentObject(userViewModel)
                             .environmentObject(authViewModel)
                             .environmentObject(mealViewModel)
                             .environmentObject(foodItemViewModel)
@@ -47,7 +51,12 @@ struct health_maintenance_supporterApp: App {
                                 authViewModel.authenticateWithBiometrics()
                             }
                     }
-                } else {
+                } else if authViewModel.userSessionLogged && !userViewModel.userOnboarded {
+                    AdditionalDetails()
+                        .environmentObject(userViewModel)
+                        .environmentObject(authViewModel)
+                }
+                else {
                     SignInView()
                         .environmentObject(authViewModel)
                 }
@@ -55,32 +64,12 @@ struct health_maintenance_supporterApp: App {
                     
             }.onAppear {
                 Auth.auth().addStateDidChangeListener { auth, user in
-                    if user != nil {
-                        userViewModel.fetchUser(email: user?.email ?? "")
-                        authViewModel.userSessionLogged.toggle()
+                    if let email = user?.email {
+                        userViewModel.setMail(email: email)
+                        userViewModel.fetchUser(email: email)
+                        authViewModel.userSessionLogged = true // Use = true, not toggle()
                     }
-                }
-            }
+                }            }
         }
-        
-        //            switch authViewModel.flowState {
-        //                case .onboarding:
-        //                    SignUp()
-        //                        .environmentObject(authViewModel)
-        //                case .login:
-        //                    FaceIDCollectionView()
-        //                        .environmentObject(authViewModel)
-        //                        .onAppear {
-        //                            authViewModel.authenticateWithBiometrics()
-        //                        }
-        //                case .userDataEntry:
-        //                    AdditionalDetails()
-        //                        .environmentObject(authViewModel)
-        //                case .mainApp:
-        //                    TabsView()
-        //                        .environmentObject(authViewModel)
-        //                        .environmentObject(mealViewModel)
-        //                        .environmentObject(foodItemViewModel)
-        //            }
     }
 }

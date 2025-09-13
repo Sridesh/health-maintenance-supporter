@@ -22,9 +22,15 @@ let byCategory: [NutritionCount] = [
 ]
 
 struct InsightsView: View {
+    @EnvironmentObject var goalViewModel: GoalsViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
+    
     @State var isAddIntakeOpen = false
     @State var customValue = ""
-    @State private var waterProgress: CGFloat = 0.67
+    var waterProgress: CGFloat {
+            guard let dailyGoal = userViewModel.goal?.dailyTargets.water, dailyGoal > 0 else { return 0 }
+            return CGFloat(goalViewModel.waterIntake / dailyGoal)
+        }
     @State private var animateProgress = false
     
     var body: some View {
@@ -55,7 +61,7 @@ struct InsightsView: View {
                         HStack{
                             ZStack {
                                 Circle()
-                                    .fill(LinearGradient(colors: [Color.blue, Color.purple], startPoint: .top, endPoint: .bottomTrailing))
+                                    .fill(LinearGradient(colors: [Color.appPrimary, Color.appSecondary], startPoint: .top, endPoint: .bottomTrailing))
                                     .frame(width: 44, height: 44)
                                 Image(systemName: "leaf.fill")
                                     .foregroundColor(.white)
@@ -68,7 +74,7 @@ struct InsightsView: View {
                                     .font(.headline)
                                 Text("Today’s macros")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.appSecondary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }.frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -80,96 +86,104 @@ struct InsightsView: View {
   
                 // MARK: - Water Intake
                 GlassCard {
-                    VStack{
-                        HStack(alignment: .top) {
-                            ZStack {
-                                Circle()
-                                    .fill(LinearGradient(colors: [Color.blue, Color.purple], startPoint: .top, endPoint: .bottomTrailing))
-                                    .frame(width: 44, height: 44)
-                                Image(systemName: "drop.fill")
-                                    .foregroundColor(.white)
-                                    .font(.title2)
-                            }
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Water Intake")
-                                    .font(.headline)
-                                Text("Keep hydrated")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                        }
-                        .padding(.bottom, 6)
-                        
-                        HStack(spacing: 24) {
-                            // Animated Progress Circle
-                            ZStack {
-                                Circle()
-                                    .stroke(Color.cyan.opacity(0.12), lineWidth: 12)
-                                Circle()
-                                    .trim(from: 0, to: animateProgress ? waterProgress : 0)
-                                    .stroke(
-                                        LinearGradient(colors: [Color.blue, Color.purple], startPoint: .top, endPoint: .bottomTrailing),
-                                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .animation(.easeOut(duration: 1.2), value: animateProgress)
-                                VStack(spacing: 2) {
-                                    Text("\(Int(waterProgress * 100))%")
-                                        .font(.title2.bold())
-                                        .foregroundColor(.blue)
-                                    Text("3.2L")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .frame(width: 90, height: 90)
-                            .onAppear { animateProgress = true }
-                            
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("Next sip in 12 min")
-                                    .font(.caption)
-                                    .foregroundColor(.cyan)
-                                    .bold()
-                                
-                                HStack(spacing: 12) {
-                                    IntakeButton(title: "-70ml", color: .purple.opacity(0.15), border: .purple)
-                                    IntakeButton(title: "+70ml", color: .blue.opacity(0.15), border: .blue)
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Custom intake (ml)")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                    HStack {
-                                        TextField("Amount", text: $customValue)
-                                            .keyboardType(.numberPad)
-                                            .padding(8)
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(8)
-                                            .frame(width: 70)
-                                            .onChange(of: customValue) { newValue in
-                                                customValue = newValue.filter { "0123456789".contains($0) }
-                                            }
-                                        Button {
-                                            // Add custom intake action
-                                        } label: {
-                                            Image(systemName: "plus.circle.fill")
-                                                .font(.title2)
-                                                .foregroundColor((Int(customValue) ?? 0) > 50 ? .blue : .gray)
-                                        }
-                                        .disabled((Int(customValue) ?? 0) <= 50)
-                                    }
-                                }
-                            }
-                            Spacer()
-                        }
-                        .padding(.top, 8)
-                        
-                    }
-                    
-                
-                 }
+                           VStack {
+                               HStack(alignment: .top) {
+                                   ZStack {
+                                       Circle()
+                                           .fill(LinearGradient(colors: [Color.appPrimary, Color.appSecondary], startPoint: .top, endPoint: .bottomTrailing))
+                                           .frame(width: 44, height: 44)
+                                       Image(systemName: "drop.fill")
+                                           .foregroundColor(.white)
+                                           .font(.title2)
+                                   }
+                                   VStack(alignment: .leading, spacing: 4) {
+                                       Text("Water Intake")
+                                           .font(.headline)
+                                       Text("Keep hydrated")
+                                           .font(.caption)
+                                           .foregroundStyle(Color.appSecondary)
+                                   }
+                                   Spacer()
+                               }
+                               .padding(.bottom, 6)
+                               
+                               HStack(spacing: 24) {
+                                   // Progress Circle
+                                   ZStack {
+                                       Circle()
+                                           .stroke(Color.appBlue.opacity(0.2), lineWidth: 12)
+                                       Circle()
+                                           .trim(from: 0, to: animateProgress ? waterProgress : 0)
+                                           .stroke(
+                                            LinearGradient(colors: [Color.appSecondary, Color.appPrimary], startPoint: .top, endPoint: .bottomTrailing),
+                                               style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                                           )
+                                           .rotationEffect(.degrees(-90))
+                                           .animation(.easeOut(duration: 1.2), value: animateProgress)
+                                       
+                                       VStack(spacing: 2) {
+                                           Text("\(Int(waterProgress * 100))%")
+                                               .font(.title2.bold())
+                                               .foregroundColor(.appPrimary)
+                                           Text(String(format: "%.1fL", goalViewModel.waterIntake))
+                                               .font(.caption2)
+                                               .foregroundColor(.appSecondary)
+                                       }
+                                   }
+                                   .frame(width: 90, height: 90)
+                                   .onAppear { animateProgress = true }
+                                   
+                                   // Intake Buttons
+                                   VStack(alignment: .leading, spacing: 10) {
+                                       Text("Next sip in 12 min")
+                                           .foregroundColor(Color.appPrimary)
+                                           .bold()
+                                       
+                                       HStack(spacing: 12) {
+                                           IntakeButton(title: "-70ml", color: Color.appYellow.opacity(0.25), border: Color.appYellow)
+                                               .onTapGesture {
+                                                   goalViewModel.removeWaterIntake(intake: 0.07) // in liters
+                                               }
+                                           IntakeButton(title: "+70ml", color: Color.appGreen.opacity(0.25), border: Color.appGreen)
+                                               .onTapGesture {
+                                                   goalViewModel.addWaterIntake(intake: 0.07)
+                                               }
+                                       }
+                                       
+                                       VStack(alignment: .leading, spacing: 4) {
+                                           Text("Custom intake (ml)")
+                                               .font(.caption)
+                                               .bold()
+                                               .foregroundColor(Color.appSecondary)
+                                           HStack {
+                                               TextField("Amount", text: $customValue)
+                                                   .keyboardType(.numberPad)
+                                                   .padding(8)
+                                                   .background(Color(.systemGray6))
+                                                   .cornerRadius(8)
+                                                   .frame(width: 150)
+                                                   .onChange(of: customValue) { newValue in
+                                                       customValue = newValue.filter { "0123456789".contains($0) }
+                                                   }
+                                               Button {
+                                                   if let intakeMl = Double(customValue) {
+                                                       goalViewModel.addWaterIntake(intake: intakeMl / 1000) // convert to liters
+                                                       customValue = ""
+                                                   }
+                                               } label: {
+                                                   Image(systemName: "plus.circle.fill")
+                                                       .font(.title2)
+                                                       .foregroundColor((Int(customValue) ?? 0) > 0 ? .blue : .gray)
+                                               }
+                                               .disabled((Int(customValue) ?? 0) <= 0)
+                                           }
+                                       }
+                                   }
+                                   Spacer()
+                               }
+                               .padding(.top, 8)
+                           }
+                       }
                 
                 
                 
@@ -179,6 +193,3 @@ struct InsightsView: View {
         }
         
     }}
-#Preview {
-    InsightsView()
-}
