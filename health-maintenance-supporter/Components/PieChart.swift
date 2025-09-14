@@ -10,7 +10,11 @@ import Charts
 
 struct PieChart: View {
     
-    let data : [NutritionCount]
+    let data : [
+        NutritionCount
+    ]
+    
+    @EnvironmentObject var mealViewModel: MealsViewModel
     
     var body: some View {
         Chart(data, id: \.category) { item in

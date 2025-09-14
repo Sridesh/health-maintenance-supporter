@@ -26,132 +26,26 @@ struct HealthView: View {
         StepData(day: "Sun", steps: 8000),
     ]
     
+    @EnvironmentObject var user : UserViewModel
     
     @StateObject private var healthStore = HealthStore()
     
     var body: some View {
         ZStack{
-            //background
-            LinearGradient(
-                gradient: Gradient(colors: [Color(.systemBlue).opacity(0.13), Color(.systemPurple).opacity(0.10)]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            
-            
             VStack(spacing: 20) {
-                HStack{
-
-                    VStack{
-                        Text("Your Activity Today")
-                            .font(.headline)
-                            .padding(.top)
-                            .padding(.horizontal, 30)
-                    }
-                }.frame(maxWidth: .infinity, alignment: .leading)
-                    
                 
+                Text("Your Activity Today")
+                    .font(.title3)
+                    .bold()
+                    .foregroundColor(.appPrimary)
+
                 
                 ScrollView{
                     //content
                     VStack(spacing: 15){
-                    GlassCard {
-                        HStack{
-                            Image(systemName: "flame")
-                                .foregroundColor(Color.white)
-                                .padding(6)
-                                .frame(width: 30)
-                                .background(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .purple]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(5)
-                            
-                            
-                            
-                            VStack(alignment: .leading) {
-                                Text("Calories Burned")
-                                    .font(.headline)
-                                
-                                HStack(alignment: .firstTextBaseline, spacing: 2) {
-                                    Text("\(Int(healthStore.basalCalories + healthStore.activeCalories))")
-                                        .font(.title2)
-                                    Text("/ 10,000")
-                                        .font(.caption).foregroundColor(Color.gray)
-                                }
-                            }
-                            
-                            
-                        }.frame(maxWidth: .infinity, alignment: .leading)
+            
+                    CalCount().environmentObject(user)
                         
-                        ZStack(alignment: .leading) {
-                            Rectangle()
-                                .frame( width: 340,height: 7)
-                                .foregroundColor(Color.gray.opacity(0.3))
-                                .cornerRadius(4)
-                            Rectangle()
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .purple]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .frame(width: 340 * 0.5, height: 7)
-                                .cornerRadius(4)
-                            
-                        }.frame(height: 7)
-                            .padding(.top)
-                        
-                        HStack{
-                            Text("At rest: ").font(.caption).font(.system(size: 15)).foregroundColor(Color.gray) +
-                            Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
-                            
-                            Spacer()
-                            
-                            Text("From activity: ").font(.system(size: 15)).foregroundColor(Color.gray) + Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
-                        }.padding(.top,3)
-                    }
-
-                    HStack{
-                        VStack {
-                            Image("walking")
-                                .resizable()
-                                .frame(width: 180, height: 110)
-                            
-                            VStack{
-                                Text("Step Count:").font(.headline)
-                                Text("\(Int(healthStore.steps))").font(.title2)
-                            }.padding(.vertical,3)
-                        }
-                        .background(Color.white.opacity(0.5))
-                        .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.3),radius: 10)
-                        Spacer()
-                        
-                        VStack {
-                            Image("steps")
-                                .resizable()
-                                .frame(width: 180, height: 110)
-                            
-                            VStack{
-                                Text("Flights Climbed:").font(.headline)
-                                Text("\(Int(healthStore.flights))").font(.title2)
-                            }.padding(.vertical,3)
-                        }
-                        .background(Color.white.opacity(0.5))
-                        .cornerRadius(10)
-                        .shadow(color:Color.gray.opacity(0.3),radius: 10)
-                        
-                        
-                        
-                    }            
-                    
                     GlassCard{
                         HStack {
                             Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
@@ -160,7 +54,7 @@ struct HealthView: View {
                                 .frame(width: 30)
                                 .background(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                        gradient: Gradient(colors: [Color.appPrimary, Color.appSecondary]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -183,7 +77,7 @@ struct HealthView: View {
                                 .interpolationMethod(.catmullRom) // smooth curve
                                 .foregroundStyle(
                                     LinearGradient(
-                                        colors: [.blue, .purple],
+                                        colors: [.appBlue, .appSecondary],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -197,7 +91,7 @@ struct HealthView: View {
                                 .interpolationMethod(.catmullRom)
                                 .foregroundStyle(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]),
+                                        gradient: Gradient(colors: [Color.appPrimary.opacity(0.3), Color.appBlue.opacity(0.2)]),
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
@@ -208,20 +102,126 @@ struct HealthView: View {
                         .padding()
                         
                     }
-                    }.padding(.horizontal, 20)
+                    }
+//                    .padding(.horizontal, 20)
                 }
                 
-                .frame(height: 730)
+                .frame(height: 620)
             }
             .frame(maxHeight: .infinity, alignment: .top)
-            .padding(.vertical)
-            //                .background(Color(hex: "#fff1ed"))
             
         }
         
     }
 }
 
+struct CalCount: View {
+    @EnvironmentObject var user : UserViewModel
+    
+    @StateObject private var healthStore = HealthStore()
+    
+    var body: some View {
+        GlassCard {
+            HStack{
+                Image(systemName: "flame")
+                    .foregroundColor(Color.white)
+                    .padding(6)
+                    .frame(width: 30)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.appPrimary, .appSecondary]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(5)
+                
+                
+                
+                VStack(alignment: .leading) {
+                    Text("Calories Burned")
+                        .font(.headline)
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text("\(Int(healthStore.basalCalories + healthStore.activeCalories))")
+                            .font(.title2)
+                        Text(" / \(user.goal?.dailyTargets.steps ?? 0)")
+                            .font(.caption).foregroundColor(Color.appSecondary)
+                    }
+                }
+                
+                
+            }
+            .frame(alignment: .leading)
+            
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .frame( width: 300,height: 7)
+                    .foregroundColor(Color.appSecondary.opacity(0.3))
+                    .cornerRadius(4)
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.appPrimary, .appSecondary]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: 300 * 0.5, height: 7)
+                    .cornerRadius(4)
+                
+            }.frame(height: 7)
+                .padding(.top)
+            
+            HStack{
+                Text("At rest: ").font(.caption).font(.system(size: 15)).foregroundColor(Color.appSecondary) +
+                Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
+                
+                Spacer()
+                
+                Text("From activity: ").font(.system(size: 15)).foregroundColor(Color.appSecondary) + Text("\(Int(healthStore.activeCalories)) kcal").font(.system(size: 15)).bold()
+            }.padding(.top,3)
+        }
+        
+        HStack{
+            VStack {
+                Image("walking")
+                    .resizable()
+                    .frame(width: 160, height: 110)
+                
+                VStack{
+                    Text("Step Count:").font(.headline).foregroundColor(.white)
+                    Text("\(Int(healthStore.steps))").font(.title2).foregroundColor(.white)
+                }.padding(.vertical,3)
+            }
+            .background(Color.appPrimary)
+            .cornerRadius(10)
+            .shadow(color:Color.appSecondary.opacity(0.3),radius: 10)
+            Spacer()
+            
+            VStack {
+                Image("steps")
+                    .resizable()
+                    .frame(width: 160, height: 110)
+                
+                VStack{
+                    Text("Flights Climbed:").font(.headline).foregroundColor(.white)
+                    Text("\(Int(healthStore.flights))").font(.title2).foregroundColor(.white)
+                }.padding(.vertical,3)
+            }
+            .background(Color.appSecondary)
+            .cornerRadius(10)
+            .shadow(color:Color.appSecondary.opacity(0.3),radius: 10)
+            
+            
+            
+        }
+    }
+}
+
 #Preview {
-    HealthView()
+    let mockGoalVM = UserViewModel()
+    
+    AdditionsView()
+        .environmentObject(mockGoalVM)
 }

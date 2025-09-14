@@ -13,17 +13,12 @@ struct NutritionCount {
     var count: Int
 }
 
-let byCategory: [NutritionCount] = [
-    .init(category: "Fat", count: 79),
-    .init(category: "Protein", count: 73),
-    .init(category: "Carbs", count: 58),
-    .init(category: "Fiber", count: 15),
-    .init(category: "Sugar", count: 9)
-]
+
 
 struct InsightsView: View {
     @EnvironmentObject var goalViewModel: GoalsViewModel
     @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var mealViewModel: MealsViewModel
     
     @State var isAddIntakeOpen = false
     @State var customValue = ""
@@ -32,6 +27,16 @@ struct InsightsView: View {
             return CGFloat(goalViewModel.waterIntake / dailyGoal)
         }
     @State private var animateProgress = false
+    
+    private var byCategory: [NutritionCount] {
+            let macros = mealViewModel.totalMacros()
+            return [
+                .init(category: "Fat", count: Int(macros.fats)),
+                .init(category: "Protein", count: Int(macros.protein)),
+                .init(category: "Carbs", count: Int(macros.carbs))
+                // .init(category: "Fiber", count: 15),
+            ]
+        }
     
     var body: some View {
         ZStack {

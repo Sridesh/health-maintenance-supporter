@@ -16,6 +16,8 @@ struct ClassificationWithVisionView: View {
     @State private var isPickerPresented = false
     @State private var isLoading = false
     @State private var errorMessage: String = ""
+    
+    @EnvironmentObject var foodItemViewModel : FoodItemViewModel
 
     var body: some View {
         VStack(spacing: 20) {
@@ -27,16 +29,20 @@ struct ClassificationWithVisionView: View {
                     .frame(height: 250)
                     .cornerRadius(12)
             } else {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.appSecondary.opacity(0.3))
                     .frame(height: 250)
-                    .overlay(Text("No Image Selected"))
+                    .overlay(Text("Upload an image of your food to identify").foregroundColor(.appPrimary))
             }
             
             Button("Choose Image") {
                 isPickerPresented = true
             }
-            .buttonStyle(.borderedProminent)
+//            .buttonStyle(.borderedProminent)
+            .padding()
+            .background(Color.appSecondary)
+            .foregroundColor(.white)
+            .cornerRadius(10)
             .disabled(isLoading)
             
             if isLoading {
@@ -45,22 +51,31 @@ struct ClassificationWithVisionView: View {
             }
             
             if !prediction.isEmpty {
-                Text("Prediction: \(prediction)")
-                    .font(.headline)
-                    .foregroundColor(.primary)
+                VStack(spacing:10){
+                    Text("Prediction: \(prediction)")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    NavigationLink(destination:
+                        FoodItemDetails(portionSize: 200.00)
+                        .environmentObject(foodItemViewModel)
+                    ){
+                        Button("Confirm") {
+                            
+                        }
+                    }
+                }
             } else if !errorMessage.isEmpty {
                 Text("Error: \(errorMessage)")
                     .font(.caption)
                     .foregroundColor(.red)
-            } else {
-                Text("Prediction: No Prediction")
-                    .foregroundColor(.secondary)
             }
         }
         .onAppear {
     testModelLoading()
 }
         .padding()
+        .frame(maxHeight: .infinity)
+        .background(Color.appSecondary.opacity(0.2))
         .photosPicker(isPresented: $isPickerPresented,
                       selection: Binding(get: { nil }, set: { newItem in
             if let newItem = newItem {
@@ -268,3 +283,6 @@ private func classifyImage(_ image: UIImage) async {
     }
 }
 
+//#Preview {
+//    ClassificationWithVisionView()
+//}

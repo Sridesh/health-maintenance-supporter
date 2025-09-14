@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct CameraView:View {
-    
-    
     @State private var isShowingSheet = false
     @State private var location = "Colombo"
     

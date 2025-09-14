@@ -25,6 +25,7 @@ struct DashboardView: View {
     @EnvironmentObject var mealViewModel: MealsViewModel
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var goalViewModel: GoalsViewModel
+//    @EnvironmentObject var
     
     @State private var animateRings = false
     @State private var location = "Colombo"
@@ -73,7 +74,7 @@ struct DashboardView: View {
                         HStack(spacing: 28) {
                             RingStat(
                                 title: "Calories",
-                                value: 1214,
+                                value: Double(mealViewModel.totalCalories()),
                                 goal: Double(userViewModel.goal?.dailyTargets.calories ?? 0),
                                 color: .orange,
                                 icon: "flame.fill",
@@ -106,9 +107,9 @@ struct DashboardView: View {
                                 .font(.headline)
                                 .foregroundColor(Color.appPrimary)
                             HStack(spacing: 18) {
-                                MacroStat(name: "Protein", value: 73, goal: Double(userViewModel.goal?.dailyTargets.macros.protein ?? 0), color: .green)
-                                MacroStat(name: "Carbs", value: 58, goal: Double(userViewModel.goal?.dailyTargets.macros.carbs ?? 0), color: .orange)
-                                MacroStat(name: "Fat", value: 79, goal: Double(userViewModel.goal?.dailyTargets.macros.fats ?? 0), color: .red)
+                                MacroStat(name: "Protein", value: mealViewModel.totalMacros().protein, goal: Double(userViewModel.goal?.dailyTargets.macros.protein ?? 0), color: .green)
+                                MacroStat(name: "Carbs", value: mealViewModel.totalMacros().carbs, goal: Double(userViewModel.goal?.dailyTargets.macros.carbs ?? 0), color: .orange)
+                                MacroStat(name: "Fat", value: mealViewModel.totalMacros().fats, goal: Double(userViewModel.goal?.dailyTargets.macros.fats ?? 0), color: .red)
                                 MacroStat(name: "Fiber", value: 15, goal: 30, color: .purple)
                             }
                         }

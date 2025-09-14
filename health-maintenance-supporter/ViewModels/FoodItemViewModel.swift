@@ -53,13 +53,15 @@ let fruitNutrition: [String: Nutrition] = [
 
 @MainActor
 final class FoodItemViewModel: ObservableObject {
+    @Published var searching = false
+    @Published var selectedFood : String = "none"
+    @Published var selectedMeal : String = "none"
+    
     private let context: ModelContext
     
     init(context: ModelContext) {
         self.context = context
     }
-    
-    @Published var selectedFood : String = "none"
     
     // MARK: - Initialize Default Meals for Today
     func changeSelectedFood(food: String) {

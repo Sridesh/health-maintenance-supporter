@@ -11,7 +11,7 @@ struct Mealiew:View {
     @EnvironmentObject var meal: MealsViewModel
         
         var totalCalories: Int {
-            meal.totalCaloriesToday()
+            meal.totalCalories()
         }
         
         var body: some View {

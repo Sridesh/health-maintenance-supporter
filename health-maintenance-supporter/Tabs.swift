@@ -38,11 +38,13 @@ struct TabsView: View {
                 InsightsView()
                     .environmentObject(goalViewModel)
                     .environmentObject(userViewModel)
+                    .environmentObject(mealViewModel)
                     .tabItem{Label("Insights", systemImage: "chart.bar.horizontal.page")}
                 
-                HealthView()
-                    .environmentObject(goalViewModel)
-                    .tabItem{Label("Activity", systemImage: "figure.walk")}
+                AdditionsView()
+                    .environmentObject(userViewModel)
+                    .environmentObject(mealViewModel)
+                    .tabItem{Label("Details", systemImage: "figure.walk")}
                 
 //                SignupView()
                 ProfileView()

@@ -21,7 +21,13 @@ struct health_maintenance_supporterApp: App {
         let container: ModelContainer
 
     init() {
-        let modelContainer = try! ModelContainer(for: User.self, Meal.self, FoodItem.self)
+        let modelContainer = try! ModelContainer(for:
+            User.self,
+            Meal.self,
+            MealList.self,
+            Food.self,      
+            Macro.self
+        )
         self.container = modelContainer
         
         _authViewModel = StateObject(wrappedValue: AuthenticationViewModel(context: modelContainer.mainContext))
@@ -32,7 +38,6 @@ struct health_maintenance_supporterApp: App {
         
         FirebaseApp.configure()
     }
-    
     var body: some Scene {
         WindowGroup {
             VStack{
@@ -69,7 +74,10 @@ struct health_maintenance_supporterApp: App {
                         userViewModel.fetchUser(email: email)
                         authViewModel.userSessionLogged = true // Use = true, not toggle()
                     }
-                }            }
+                }
+                
+//                mealViewModel.s
+            }
         }
     }
 }

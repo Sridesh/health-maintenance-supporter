@@ -6,112 +6,121 @@
 import SwiftUI
 import SwiftData
 
-
-// MARK: - MealsViewModel
 @MainActor
 final class MealsViewModel: ObservableObject {
-    private let context: ModelContext
+    private var context: ModelContext
     
-    
-    @Published var meals: [Meal] = []
-    
-    // UI properties
-    @Published var selectedMeal: String = ""
-    @Published var mealWindowOpen: Bool = false
-    
+    @Published var todayMealList: MealList?
+    @Published var mealWindowOpen = false
+    @Published var selectedMeal = ""
+
     init(context: ModelContext) {
         self.context = context
-        
-        Task {
-            await checkAndCreateDefaultMeals()
-        }
+        setupTodayMealList()
     }
-    
-    // MARK: - Initialize Default Meals for Today
-    private func checkAndCreateDefaultMeals() async {
+
+    // MARK: - Create or fetch today's meal list
+    private func setupTodayMealList() {
+        print("Hellooooo")
         let calendar = Calendar.current
-           let startOfDay = calendar.startOfDay(for: Date())
-           let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        let today = calendar.startOfDay(for: Date())
         
-        let request = FetchDescriptor<Meal>(
-            predicate: #Predicate { meal in
-                        meal.date >= startOfDay && meal.date < endOfDay
-                    }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let todayString = formatter.string(from: today)
+        
+        print("Looking for meal list with dateString: \(todayString)")
+        
+        // Fetch existing MealList for today
+        let fetchDescriptor = FetchDescriptor<MealList>(
+            predicate: #Predicate<MealList> { $0.dateString == todayString }
         )
         
-        let existingMeals = (try? context.fetch(request)) ?? []
-        
-        if existingMeals.isEmpty {
-            // No meals exist for today → create default meals
-            initiateMeals()
+        if let existing = try? context.fetch(fetchDescriptor).first {
+            self.todayMealList = existing
+            print("Found existing meal list for today")
+        } else {
+            print("Creating new meal list for today")
+            // Create default meals for today
+            let defaultMeals = [
+                Meal(name: "Breakfast"),
+                Meal(name: "Lunch"),
+                Meal(name: "Dinner"),
+                Meal(name: "Snacks")
+            ]
+            
+            print("TODAY \(today)")
+            
+            let newMealList = MealList(date: today, meals: defaultMeals)
+            context.insert(newMealList)
+            
+            do {
+                try context.save()
+                self.todayMealList = newMealList
+                print("Successfully created and saved new meal list")
+            } catch {
+                print("Failed to save MealList: \(error)")
+            }
         }
+    }
+    
+    // MARK: - Add food to a specific meal
+    func addFood(to mealName: String, food: Food) {
+        guard let mealList = todayMealList else { return }
+        guard let meal = mealList.meals.first(where: { $0.name == mealName }) else { return }
         
-        // Update published property
-        self.meals = (try? context.fetch(request)) ?? existingMeals
-    }
-    
-    private func initiateMeals() {
-        addMeal(name: "Breakfast")
-        addMeal(name: "Lunch")
-        addMeal(name: "Dinner")
-        addMeal(name: "Snacks")
-    }
-    
-    // MARK: - CRUD for Meals
-    func addMeal(name: String, date: Date = Date(), foodItems: [FoodItem] = []) {
-        let meal = Meal(name: name, date: date, foodItems: foodItems)
-        context.insert(meal)
-        saveContext()
-        meals.append(meal) // update published array
-    }
-    
-    func deleteMeal(_ meal: Meal) {
-        context.delete(meal)
-        saveContext()
-        meals.removeAll { $0.id == meal.id }
-    }
-    
-    // MARK: - CRUD for Food Items
-    func addFood(to meal: Meal, name: String, calories: Int, grams: Int) {
-        let food = FoodItem(name: name, calories: calories, grams: grams)
         meal.foodItems.append(food)
+        context.insert(food)
         saveContext()
-        objectWillChange.send() // notify UI for changes inside meal
     }
     
-    func deleteFood(from meal: Meal, food: FoodItem) {
-        if let index = meal.foodItems.firstIndex(where: { $0.id == food.id }) {
-            meal.foodItems.remove(at: index)
-            saveContext()
-            objectWillChange.send()
-        }
-    }
-    
-    // MARK: - Total Calories
-    func totalCalories(for meal: Meal) -> Int {
-        meal.foodItems.reduce(0) { $0 + $1.calories }
-    }
-    
-    func totalCaloriesToday() -> Int {
-        meals.flatMap { $0.foodItems }.reduce(0) { $0 + $1.calories }
-    }
-    
-    // MARK: - Meal Selection (UI)
-    func changeMeal( meal: String) {
-        self.selectedMeal = meal
+    // MARK: - Remove food from a specific meal
+    func removeFood(from mealName: String, food: Food) {
+        guard let mealList = todayMealList else { return }
+        guard let meal = mealList.meals.first(where: { $0.name == mealName }) else { return }
         
+        meal.foodItems.removeAll { $0.id == food.id }
+        context.delete(food)
+        saveContext()
     }
     
-    func getMealList(meal: String) {
-       
+    // MARK: - Total calories for today
+    func totalCalories() -> Int {
+        guard let mealList = todayMealList else { return 0 }
+        return mealList.meals.flatMap { $0.foodItems }.reduce(0) { $0 + $1.calories }
     }
     
-    // MARK: - Save Context
+    // MARK: - Total grams for today
+    func totalGrams() -> Int {
+        guard let mealList = todayMealList else { return 0 }
+        return mealList.meals.flatMap { $0.foodItems }.reduce(0) { $0 + $1.grams }
+    }
+    
+    // MARK: - Save context
     private func saveContext() {
         do {
             try context.save()
         } catch {
             print("Failed to save context: \(error)")
         }
+    }
+    
+    // MARK: - Macro Totals
+    func totalMacros() -> (carbs: Double, protein: Double, fats: Double) {
+        guard let mealList = todayMealList else { return (0, 0, 0) }
+        
+        var totalCarbs: Double = 0
+        var totalProtein: Double = 0
+        var totalFats: Double = 0
+        
+        for food in mealList.meals.flatMap({ $0.foodItems }) {
+            if let macros = food.macros {
+                totalCarbs += macros.carbs
+                totalProtein += macros.protein
+                totalFats += macros.fats
+            }
+        }
+        
+        return (totalCarbs, totalProtein, totalFats)
     }
 }

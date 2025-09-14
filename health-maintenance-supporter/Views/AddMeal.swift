@@ -1,120 +1,118 @@
 import SwiftUI
+import SwiftData
 
 struct AddMeal: View {
-    @State private var searchText = ""
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
     
-    // Dummy food data
-    let allFoods = [
-        "Apple",
-        "Banana",
-        "Chicken Breast",
-        "Oatmeal",
-        "Greek Yogurt",
-        "Salmon",
-        "Broccoli",
-        "Rice",
-        "Eggs",
-        "Almonds"
-    ]
-    
-    var filteredFoods: [String] {
-        if searchText.isEmpty {
-            return allFoods
-        } else {
-            return allFoods.filter { $0.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-    
-    
+
     
     var body: some View {
         NavigationView {
             VStack {
-                // Search bar
-//                TextField("Search foods...", text: $searchText)
-//                    .padding(10)
-//                    .background(Color(.systemGray6))
-//                    .cornerRadius(8)
-//                    .padding(.horizontal)
-//                    .padding(.top)
-//                
-//                // Show search results if searching
-//                if !searchText.isEmpty {
-//                    List(filteredFoods, id: \.self) { food in
-//                        Text(food)
-//                    }
-//                    .frame(height: 200)
-//                }
-                
-                FoodSearch()
-                    .environmentObject(foodItemViewModel)
-                    .padding(.bottom)
-                
-                HStack {
-                    VStack {
-                        Image(systemName: "camera.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width:40)
-                            .foregroundColor(Color.appPrimary)
-                            .padding(.bottom)
-                        Text("Take Photo")
-                    }
+                Text("Add a food item").font(.title3).bold().foregroundColor(.appPrimary).frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .frame(width: 150)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(color: Color(hex: "#ff724c").opacity(0.2), radius: 10)
-                    .padding(.trailing)
-                    
-                    VStack {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width:40)
-                            .foregroundColor(Color.appPrimary)
-                            .padding(.bottom)
-                        Text("Upload Photo")
-                    }
-                    .padding()
-                    .frame(width: 150)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(color: Color(hex: "#ff724c").opacity(0.2), radius: 10)
-                }
                 
-                Divider()
-                    .padding(.top)
-                
-                VStack{
-                    Text("Recent")
-                        .padding(10)
-                        .background(Color.appText)
-                        .foregroundColor(.white)
-                        .bold()
-                        .cornerRadius(50)
-                        .padding(.top)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
                     VStack{
-                        Image("meal")
-                            .padding(.top)
-                        Text("No recently added records").bold()
-                        Text("Search for what you ate today or upload your meals")
-                            .frame(alignment:.center)
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        Text("Manually search for food").font(.headline).foregroundColor(.appText).frame(maxWidth: .infinity, alignment: .leading)
+                        FoodSearch()
+                            .environmentObject(foodItemViewModel)
+                            .padding(.bottom)
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
+   
+                if !foodItemViewModel.searching {
+                    VStack{
+                        Divider()
+                            .padding(.vertical)
+                            .foregroundColor(Color.appPrimary)
                         
+                        VStack{
+                            Text("Identify nutritions with AI").font(.headline).foregroundColor(.appText).frame(maxWidth: .infinity, alignment: .leading)
+                            HStack {
+                                NavigationLink(destination: ClassificationWithVisionView().environmentObject(foodItemViewModel)) {
+                                    VStack {
+                                        Image(systemName: "camera.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width:40)
+                                            .foregroundColor(Color.appPrimary)
+                                            .padding(.bottom)
+                                        Text("Take Photo").foregroundColor(Color.appPrimary).bold()
+                                    }
+                                    .padding()
+                                    .frame(width: 150)
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
+                                    .padding(.trailing)
+                                }
+                                
+                                VStack {
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width:40)
+                                        .foregroundColor(Color.appPrimary)
+                                        .padding(.bottom)
+                                    Text("Upload Photo").foregroundColor(Color.appPrimary).bold()
+                                }
+                                .padding()
+                                .frame(width: 150)
+                                .background(Color.white)
+                                .cornerRadius(10)
+                                .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
+                            }
+                        }
+                        
+                        Divider()
+                            .padding(.top)
+                            .foregroundColor(Color.appPrimary)
+                        
+                        VStack{
+                            Text("Recent")
+                                .padding(10)
+                                .background(Color.appSecondary)
+                                .foregroundColor(.white)
+                                .bold()
+                                .cornerRadius(50)
+                                .padding(.top)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            VStack{
+                                Image("meal")
+                                    .padding(.top)
+                                Text("No recently added records").bold()
+                                Text("Search for what you ate today or upload your meals")
+                                    .frame(alignment:.center)
+                                    .font(.caption)
+                                    .foregroundColor(.appSecondary).bold()
+                            }.padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            
+                        }
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding()
-            .background(Color(hex: "#fff1ed"))
+            .background(Color.appSecondary.opacity(0.3))
         }
         .navigationTitle("Lecturer Meetings")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+#Preview {
+    // 1️⃣ Create in-memory container
+    let container = try! ModelContainer(for: Food.self, Macro.self, Meal.self, MealList.self)
+    
+    // 2️⃣ Create a ModelContext
+    let context = ModelContext(container)
+    
+    // 3️⃣ Create the ViewModel with context
+    let foodVM = FoodItemViewModel(context: context)
+    
+    // 4️⃣ Pass it to the view
+    AddMeal()
+        .environmentObject(foodVM)
+        .environment(\.modelContext, context)
 }

@@ -10,13 +10,13 @@ import SwiftUI
 struct FoodSearch: View {
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
     @State private var searchText = ""
-    
+
     let allFoods : [String] = [
         "Apple", "Banana", "Chicken Breast", "Oatmeal", "Greek Yogurt",
         "Salmon", "Broccoli", "Rice", "Eggs", "Almonds",
         "Avocado", "Spinach", "Sweet Potato", "Tofu", "Quinoa"
     ]
-    
+
     var filteredFoods: [String] {
         if searchText.isEmpty {
             return []
@@ -24,70 +24,71 @@ struct FoodSearch: View {
             return allFoods.filter { $0.localizedCaseInsensitiveContains(searchText) }
         }
     }
-    
+
     var body: some View {
-        VStack(spacing: 20) {
-            // Beautiful search bar
+        VStack(spacing: 10) {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.orange)
                     .padding(.leading, 8)
+
                 TextField("Search food...", text: $searchText)
                     .padding(10)
-                    .background(Color.clear)
-                    .foregroundColor(.primary)
+                    .background(Color.white.opacity(0.3))
+                    .cornerRadius(8)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+
                 if !searchText.isEmpty {
-                    Button(action: {
-                        withAnimation { searchText = "" }
+                    Button(action: { 
+                        searchText = ""
+                        foodItemViewModel.searching = false
                     }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.appSecondary)
                     }
                     .padding(.trailing, 8)
-                    .transition(.scale)
                 }
             }
-            .padding(6)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.appPrimary.opacity(0.1))
-                    .shadow(color: Color.orange.opacity(0.15), radius: 6, x: 0, y: 2)
-            )
-            .animation(.easeInOut, value: searchText)
             
-            // Only show the list if searching
+            // Show results only if there is text
             if !searchText.isEmpty {
-                List(filteredFoods, id: \.self) { food in
-                    HStack {
-                        Image(systemName: "fork.knife.circle.fill")
-                            .foregroundColor(Color.appSecondary)
-                        Text(food)
-                            .font(.headline)
+                VStack(spacing: 0) {
+                    ForEach(filteredFoods, id: \.self) { food in
+                        NavigationLink(destination: FoodItemDetails(portionSize: 200.00)
+                                        .onAppear {
+                                            foodItemViewModel.changeSelectedFood(food: food)
+                                        }) {
+                            HStack {
+                                Image(systemName: "fork.knife.circle.fill")
+                                    .foregroundColor(.appSecondary)
+                                Text(food)
+                                    .font(.headline)
+                                    .foregroundColor(Color.appText)
+                                Spacer()
+                            }
+                            .padding(.vertical, 6)
+                            .padding(.horizontal)
+                            .background(Color.white.opacity(0.1))
+                        }
                     }
-                    .onTapGesture {
-                        foodItemViewModel.changeSelectedFood(food: food)
-                    }
-                    .padding(.vertical, 4)
                 }
-                .listStyle(.plain)
+                .onAppear{
+                    foodItemViewModel.searching = true
+                }.onDisappear{
+                    foodItemViewModel.searching = false
+                }
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1)))
+                .padding(.horizontal)
             }
         }
     }
 }
 
+
 #Preview {
     FoodSearch()
 }
-
-//struct BeautifulSearchBar_Previews: PreviewProvider {
-//    static var previews: some View {
-//        StatefulPreviewWrapper("") { FoodSearch() }
-//            .padding()
-//            .background(Color(.systemGroupedBackground))
-//    }
-//}
 
 // Helper for previewing with @Binding
 struct StatefulPreviewWrapper<Value>: View {
