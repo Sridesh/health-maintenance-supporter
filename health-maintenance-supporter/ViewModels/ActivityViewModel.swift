@@ -16,50 +16,73 @@ final class ActivityViewModel: ObservableObject {
     
     init(context: ModelContext) {
         self.context = context
-        fetchOrCreateTodayActivity()
+        setupTodayActivity()
     }
     
-    //MARK: -  Fetch today's activity. If not found, create a new one.
-    func fetchOrCreateTodayActivity() {
+    //MARK: -  Fetch today's activity
+    @MainActor
+    private func setupTodayActivity() {
+        print("Setting up today’s activity")
+        
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
-        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) else {
-            print("Error computing tomorrow's date")
-            return
-        }
-    
-        let descriptor = FetchDescriptor<Activity>(
-            predicate: #Predicate { $0.date >= today && $0.date < tomorrow }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let todayString = formatter.string(from: today)
+        
+        print("Looking for activity with dateString: \(todayString)")
+        
+        // Fetch existing Activity record for today
+        let fetchDescriptor = FetchDescriptor<Activity>(
+            predicate: #Predicate<Activity> { $0.dateString == todayString }
         )
         
-        do {
-            let activities = try context.fetch(descriptor)
-            if let existing = activities.first {
-                todayActivity = existing
-            } else {
-                // No record found, create a new default activity
-                let newActivity = Activity(date: today, steps: 0, distance: 0.0, burn: 0)
-                context.insert(newActivity)
+        if let existing = try? context.fetch(fetchDescriptor).first {
+            print("Found existing activity record for today")
+            self.todayActivity = existing
+        } else {
+            print("Creating new activity record for today")
+            
+            let newActivity = Activity(date: today, steps: 0, distance: 0.0, burn: 0)
+            context.insert(newActivity)
+            
+            do {
                 try context.save()
-                todayActivity = newActivity
+                self.todayActivity = newActivity
+                print("Successfully created and saved new activity record")
+            } catch {
+                print("Failed to save Activity: \(error)")
             }
-        } catch {
-            print("Error fetching/creating today's activity: \(error)")
         }
     }
-    
-    //MARK: -  Update values for today's activity
-    func updateToday(steps: Int? = nil, distance: Double? = nil, burn: Int? = nil) {
-        guard let activity = todayActivity else { return }
+    //MARK: -  update activity
+    func updateTodayActivity(steps: Int? = nil, distance: Double? = nil, burn: Int? = nil) {
+        print("Updating activity")
+        guard let activity = todayActivity else {
+            print("No activity record found for today")
+            return
+        }
         
-        if let steps = steps { activity.steps = steps }
-        if let distance = distance { activity.distance = distance }
-        if let burn = burn { activity.burn = burn }
+        if let steps = steps {
+            activity.steps = steps
+        }
+        
+        if let distance = distance {
+            activity.distance = distance
+        }
+        
+        if let burn = burn {
+            activity.burn = burn
+        }
         
         do {
             try context.save()
+            print("Successfully updated today's activity")
+            // Notify SwiftUI that object changed
+            objectWillChange.send()
         } catch {
-            print("Error saving updated activity: \(error)")
+            print("Failed to update today's activity: \(error)")
         }
     }
 }

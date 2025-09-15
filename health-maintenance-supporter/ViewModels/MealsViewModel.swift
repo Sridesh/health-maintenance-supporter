@@ -123,4 +123,15 @@ final class MealsViewModel: ObservableObject {
         
         return (totalCarbs, totalProtein, totalFats)
     }
+    
+    // MARK: - Totals for a specific meal
+    func totals(for mealName: String) -> (calories: Int, grams: Int) {
+        guard let mealList = todayMealList else { return (0, 0) }
+        guard let meal = mealList.meals.first(where: { $0.name == mealName }) else { return (0, 0) }
+        
+        let totalCalories = meal.foodItems.reduce(0) { $0 + $1.calories }
+        let totalGrams = meal.foodItems.reduce(0) { $0 + $1.grams }
+        
+        return (totalCalories, totalGrams)
+    }
 }

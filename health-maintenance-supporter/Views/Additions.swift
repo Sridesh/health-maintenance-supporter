@@ -17,6 +17,7 @@ struct AdditionsView: View {
     
     @EnvironmentObject var userViewModel : UserViewModel
     @EnvironmentObject var mealViewModel : MealsViewModel
+    @EnvironmentObject var goalViewModel : GoalsViewModel
     
     @State private var selectedTab: Tab = .nutrition
     
@@ -46,7 +47,9 @@ struct AdditionsView: View {
                     case .nutrition:
                         FoodIntakeView()
                     case .tasks:
-                        WaterTabView()
+                        DailyGoals()
+                            .environmentObject(goalViewModel)
+                            .environmentObject(userViewModel)
                     case .activity:
                         HealthView()
                             .environmentObject(userViewModel)
@@ -68,44 +71,6 @@ struct AdditionsView: View {
     }
 }
 
-// MARK: - Sample Tab Views
-
-struct WaterTabView: View {
-    var body: some View {
-        VStack {
-            Text("Water Intake")
-                .font(.headline)
-            HStack {
-                Text("Goal:")
-                Spacer()
-                Text("3.2L")
-            }
-            HStack {
-                Text("Consumed:")
-                Spacer()
-                Text("2.1L")
-            }
-        }
-        .padding()
-    }
-}
 
 
-#Preview {
-    // 1️⃣ Create in-memory container
-    let container = try! ModelContainer(for: MealList.self, Meal.self, Food.self)
-    
-    // 2️⃣ Create a ModelContext
-    let context = ModelContext(container)
-    
-    // 3️⃣ Create your ViewModels
-    let mockUserVM = UserViewModel()
-    let mealVM = MealsViewModel(context: context)
-    
-    // 4️⃣ Pass them to the view
-    AdditionsView()
-        .environmentObject(mockUserVM)
-        .environmentObject(mealVM)
-        .environment(\.modelContext, context)
-}
 

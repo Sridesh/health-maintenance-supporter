@@ -14,6 +14,7 @@ struct TabsView: View {
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var goalViewModel: GoalsViewModel
+    @EnvironmentObject var activityViewModel: ActivityViewModel
     
     @State private var selectedTab = 0
     var body: some View {
@@ -33,12 +34,15 @@ struct TabsView: View {
                     .environmentObject(goalViewModel)
                     .environmentObject(userViewModel)
                     .environmentObject(mealViewModel)
+                    .environmentObject(activityViewModel)
+                    .environmentObject(foodItemViewModel)
                     .tabItem{Label("Home", systemImage:"house")}
 
                 InsightsView()
                     .environmentObject(goalViewModel)
                     .environmentObject(userViewModel)
                     .environmentObject(mealViewModel)
+                    .environmentObject(goalViewModel)
                     .tabItem{Label("Insights", systemImage: "chart.bar.horizontal.page")}
                 
                 AdditionsView()

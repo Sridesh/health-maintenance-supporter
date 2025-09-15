@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FitnessListView: View {
     @State private var selectedPlan: FitnessPlan? = nil
+    let isInside : Bool
     
     @EnvironmentObject var userViewModel: UserViewModel
     
@@ -25,7 +26,7 @@ struct FitnessListView: View {
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $userViewModel.openModal) {
                 if let plan = selectedPlan {
-                    FitnessDetailView(plan: plan)
+                    FitnessDetailView(plan: plan, isInsideApp: isInside)
                         .environmentObject(userViewModel)
                         .presentationDetents([.large])
                         .presentationDragIndicator(.visible)
@@ -105,6 +106,7 @@ struct StatChip: View {
 
 struct FitnessDetailView: View {
     let plan: FitnessPlan
+    let isInsideApp: Bool
     
     @EnvironmentObject var userViewModel: UserViewModel
     
@@ -179,6 +181,10 @@ struct FitnessDetailView: View {
                     Button("Select This"){
                         userViewModel.currentUser.goalId = plan.id
                         userViewModel.openModal = false
+                        
+                        if isInsideApp {
+                            userViewModel.updateUserGoal(goalId: plan.id)
+                        }
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -193,14 +199,14 @@ struct FitnessDetailView: View {
     }
 }
 
-struct FitnessListView_Previews: PreviewProvider {
-    static var previews: some View {
-        FitnessListView()
-    }
-}
-
-struct FitnessDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        FitnessDetailView(plan: fitnessPlans.first!)
-    }
-}
+//struct FitnessListView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        FitnessListView()
+//    }
+//}
+//
+//struct FitnessDetailView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        FitnessDetailView(plan: fitnessPlans.first!)
+//    }
+//}

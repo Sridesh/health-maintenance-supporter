@@ -12,19 +12,25 @@ struct FoodIntakeView: View {
 
     @EnvironmentObject var mealViewModel: MealsViewModel
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var goalsViewModel: GoalsViewModel
     
-    @State private var openSheet = false   // ← Move @State here
+    @State private var openSheet = false   
 
     var body: some View {
         VStack(spacing: 20){
-            Text("Your Food Intake Today")
+            Text("Your Intakes Today")
                 .font(.title3)
                 .bold()
                 .foregroundColor(.appPrimary)
-            
+                    
             ScrollView{
                 VStack{
                     if let mealList = mealViewModel.todayMealList {
+                        WaterIntake()
+                            .environmentObject(userViewModel)
+                            .environmentObject(goalsViewModel)
+
                         mealCards(meals: mealList.meals)
                     }
                 }
@@ -72,8 +78,8 @@ struct FoodIntakeView: View {
                             grams: foodItem.grams,
                             calories: foodItem.calories
                         )
-                        Button("", systemImage: "minus.circle", role: .destructive){
-                            mealViewModel.removeFood(from: meal, food: Food(name: foodItem.name, calories: foodItem.calories, grams: foodItem.grams, macros: foodItem.macros))
+                        Button("", systemImage: "minus.circle", role: .destructive) {
+                            mealViewModel.removeFood(from: meal, food: foodItem)
                         }
                     }
                     Divider()

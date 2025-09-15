@@ -148,7 +148,7 @@ struct AdditionalDetails: View {
                             .shadow(radius: 8, y: 4)
                     }
                 } else {
-                    FitnessListView()
+                    FitnessListView(isInside:false)
                         .environmentObject(userModel)
                 }
             }

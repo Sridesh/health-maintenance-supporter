@@ -12,7 +12,7 @@ struct FitnessPlan {
     let goal: String
     let description: String
     let dailyTargets: DailyTargets
-    let specialTargets: [String: Any] // flexible, since keys differ
+    let specialTargets: [String: Any]
 }
 
 struct DailyTargets {

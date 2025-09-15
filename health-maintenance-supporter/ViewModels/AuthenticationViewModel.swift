@@ -112,30 +112,6 @@ final class AuthenticationViewModel: ObservableObject {
     // MARK: - User profile creation
     
     func register(email: String, password: String) {
-//            let descriptor = FetchDescriptor<User>(predicate: #Predicate { $0.email == email })
-//            
-//        if let _ = try? context.fetch(descriptor).first {
-//                error = "User with this email already exists."
-//                return
-//            }
-//        
-//        let newUser = User(
-//                email: email,
-//                password: password,
-//                gender: "",
-//                height: 0,
-//                weight: 0,
-//                age: 0,
-//                isBiometricsAllowed: false
-//            )
-//        
-//        context.insert(newUser)
-//        try? context.save()
-//
-////        isAuthenticated = true
-//        user = newUser
-//        self.updateFlowState()
-       
         firebaseService.FBRegister(email: email, password: password)
         print("Resigtering in Firebase successful")
     }

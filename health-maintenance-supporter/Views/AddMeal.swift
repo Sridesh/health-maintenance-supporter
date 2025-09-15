@@ -28,7 +28,7 @@ struct AddMeal: View {
                         VStack{
                             Text("Identify nutritions with AI").font(.headline).foregroundColor(.appText).frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
-                                NavigationLink(destination: ClassificationWithVisionView().environmentObject(foodItemViewModel)) {
+                                NavigationLink(destination: CameraClassificationView().environmentObject(foodItemViewModel)) {
                                     VStack {
                                         Image(systemName: "camera.fill")
                                             .resizable()
@@ -45,21 +45,22 @@ struct AddMeal: View {
                                     .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
                                     .padding(.trailing)
                                 }
-                                
-                                VStack {
-                                    Image(systemName: "photo")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width:40)
-                                        .foregroundColor(Color.appPrimary)
-                                        .padding(.bottom)
-                                    Text("Upload Photo").foregroundColor(Color.appPrimary).bold()
+                                NavigationLink(destination: ClassificationWithVisionView().environmentObject(foodItemViewModel)){
+                                    VStack {
+                                        Image(systemName: "photo")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width:40)
+                                            .foregroundColor(Color.appPrimary)
+                                            .padding(.bottom)
+                                        Text("Upload Photo").foregroundColor(Color.appPrimary).bold()
+                                    }
+                                    .padding()
+                                    .frame(width: 150)
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
                                 }
-                                .padding()
-                                .frame(width: 150)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
                             }
                         }
                         
@@ -99,20 +100,4 @@ struct AddMeal: View {
         .navigationTitle("Lecturer Meetings")
         .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-#Preview {
-    // 1️⃣ Create in-memory container
-    let container = try! ModelContainer(for: Food.self, Macro.self, Meal.self, MealList.self)
-    
-    // 2️⃣ Create a ModelContext
-    let context = ModelContext(container)
-    
-    // 3️⃣ Create the ViewModel with context
-    let foodVM = FoodItemViewModel(context: context)
-    
-    // 4️⃣ Pass it to the view
-    AddMeal()
-        .environmentObject(foodVM)
-        .environment(\.modelContext, context)
 }

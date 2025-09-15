@@ -1,33 +1,29 @@
 //
-//  Activity.swift
+//  Water.swift
 //  health-maintenance-supporter
 //
-//  Created by Sridesh 001 on 2025-09-14.
+//  Created by Sridesh 001 on 2025-09-15.
 //
 
 import SwiftUI
 import SwiftData
 
 @Model
-class Activity {
+class Water {
     @Attribute(.unique) var dateString: String
-    var steps: Int
-    var distance: Double
-    var burn: Int
+    var intake: Double
     
+
     var date: Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.date(from: dateString) ?? Date()
     }
     
-    init(date: Date, steps: Int, distance: Double, burn: Int) {
+    init(date: Date, intake:Double) {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         self.dateString = formatter.string(from: date)
-        self.steps = steps
-        self.distance = distance
-        self.burn = burn
+        self.intake = intake
     }
 }
-

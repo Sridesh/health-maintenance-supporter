@@ -74,7 +74,7 @@ struct HealthView: View {
                                     x: .value("Day", point.day),
                                     y: .value("Steps", point.steps)
                                 )
-                                .interpolationMethod(.catmullRom) // smooth curve
+                                .interpolationMethod(.catmullRom)
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.appBlue, .appSecondary],
@@ -83,7 +83,7 @@ struct HealthView: View {
                                     )
                                 )
                                 
-                                // Optional: Fill under the line with gradient
+
                                 AreaMark(
                                     x: .value("Day", point.day),
                                     y: .value("Steps", point.steps)
@@ -106,7 +106,7 @@ struct HealthView: View {
 //                    .padding(.horizontal, 20)
                 }
                 
-                .frame(height: 620)
+                .frame(height: 550)
             }
             .frame(maxHeight: .infinity, alignment: .top)
             

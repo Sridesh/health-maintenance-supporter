@@ -23,6 +23,7 @@ final class UserViewModel: ObservableObject {
     @Published var userOnboarded = false
     @Published var openModal = false
     @Published var goal : FitnessPlan?
+    @Published var userName = ""
     
     private let db = Firestore.firestore()
     
@@ -73,9 +74,15 @@ final class UserViewModel: ObservableObject {
     
     // MARK: - Set email
     func setMail(email: String) {
-        
         self.currentUser.email = email
     }
+    
+    // MARK: - get BMI
+    func getBMI() -> Double {
+        let heightInMeters = Double(currentUser.height) / 100.0
+        return currentUser.weight / (heightInMeters * heightInMeters)
+    }
+
     
     // MARK: - Create or update user
     func setUser(user: UserType) {
@@ -165,6 +172,64 @@ final class UserViewModel: ObservableObject {
                             
                             self.currentUser = updated
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+//    func updateUserGoal(goalId: Int) {
+//        let email = self.currentUser.email
+//        let userRef = self.db.collection("Users").document(email)
+//
+//        userRef.updateData([
+//            "goalId": goalId
+//        ]) { error in
+//            if let error = error {
+//                print("Error updating goalId: \(error)")
+//            } else {
+//                DispatchQueue.main.async {
+//                    self.currentUser.goalId = goalId
+//                    print("goalId updated successfully in Firestor")
+//                }
+//            }
+//        }
+//    }
+    
+    func updateUserGoal(goalId: Int) {
+        let email = self.currentUser.email
+        let usersRef = db.collection("Users")
+        
+        // Query to find the document with the matching email (same pattern as your other methods)
+        usersRef.whereField("email", isEqualTo: email).getDocuments { [weak self] snapshot, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error finding user: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let document = snapshot?.documents.first else {
+                print("No user found with email \(email)")
+                return
+            }
+            
+            // Update the found document using its document ID
+            usersRef.document(document.documentID).updateData([
+                "goalId": goalId
+            ]) { error in
+                if let error = error {
+                    print("Error updating goalId: \(error.localizedDescription)")
+                } else {
+                    DispatchQueue.main.async {
+                        self.currentUser.goalId = goalId
+                        
+                        // Also update the goal object to keep UI in sync
+                        if let selectedPlan = fitnessPlans.first(where: { $0.id == goalId }) {
+                            self.goal = selectedPlan
+                        }
+                        
+                        print("goalId updated successfully in Firestore")
                     }
                 }
             }
