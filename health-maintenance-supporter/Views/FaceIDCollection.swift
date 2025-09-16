@@ -11,13 +11,48 @@ struct FaceIDCollectionView: View {
     @EnvironmentObject var session: AuthenticationViewModel
     
     var body: some View {
-        VStack(alignment: .leading){
+        ZStack{
             LinearGradient(
                 gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
-        }.frame(maxHeight: .infinity, alignment: .top)
+            
+            VStack(alignment: .leading){
+                Text("Please authenticate with your FaceID to proceed to the application")
+                    .foregroundColor(.white)
+                    .bold()
+                    .frame(width: 300)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom)
+                
+                Button(action: {
+                    session.authenticateWithBiometrics()
+                }) {
+                    HStack {
+                        Image(systemName: "faceid")
+                            .font(.title)
+                            .padding(.trailing)
+                        Text("Authenticate Face ID")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(width:300)
+                    .padding()
+                    .background(
+//                        RoundedRectangle(cornerRadius: 14)
+//                            .stroke(Color.white, lineWidth: 4)
+                        .white.opacity(0.5)
+                    )
+                    .foregroundColor(Color.appSecondary)
+                }
+                .cornerRadius(14)
+                .shadow(radius: 8, y: 4)
+                
+            }
+            .padding()
+            .frame(maxHeight: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
     }
 }

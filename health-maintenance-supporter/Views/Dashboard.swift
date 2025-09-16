@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 
+
 struct MealType : Identifiable{
     let id : Int
     let title : String
@@ -50,7 +51,7 @@ struct DashboardView: View {
                             Text("Welcome,")
                                 .font(.title2)
                                 .foregroundColor(Color.appSecondary)
-                            Text(userViewModel.userName)
+                            Text(userViewModel.currentUser.name.capitalized)
                                 .font(.largeTitle.bold())
                                 .foregroundColor(Color.appPrimary)
                             Text(Date(), style: .date)
@@ -79,9 +80,9 @@ struct DashboardView: View {
                                 .font(.headline)
                                 .foregroundColor(Color.appPrimary)
                             HStack(spacing: 18) {
-                                MacroStat(name: "Protein", value: mealViewModel.totalMacros().protein, goal: Double(userViewModel.goal?.dailyTargets.macros.protein ?? 0), color: .green)
-                                MacroStat(name: "Carbs", value: mealViewModel.totalMacros().carbs, goal: Double(userViewModel.goal?.dailyTargets.macros.carbs ?? 0), color: .orange)
-                                MacroStat(name: "Fat", value: mealViewModel.totalMacros().fats, goal: Double(userViewModel.goal?.dailyTargets.macros.fats ?? 0), color: .red)
+                                MacroStat(name: "Protein", value: mealViewModel.totalMacros().protein, goal: Double(userViewModel.goal?.dailyTargets.macros.protein ?? 1), color: .green)
+                                MacroStat(name: "Carbs", value: mealViewModel.totalMacros().carbs, goal: Double(userViewModel.goal?.dailyTargets.macros.carbs ?? 1), color: .orange)
+                                MacroStat(name: "Fat", value: mealViewModel.totalMacros().fats, goal: Double(userViewModel.goal?.dailyTargets.macros.fats ?? 1), color: .red)
                                 MacroStat(name: "Fiber", value: 15, goal: 30, color: .purple)
                             }
                         }
@@ -143,6 +144,12 @@ struct DailyRings: View {
     
     @State var animateRings = false   // <-- changed from 'let' to '@State'
     
+    @StateObject private var healthStore = HealthStore()
+    
+    private var burn: Double {
+        (healthStore.basalCalories + healthStore.activeCalories)
+    }
+    
     var body: some View {
         // Daily Summary Rings
         GlassCard {
@@ -155,7 +162,7 @@ struct DailyRings: View {
             HStack(spacing: 28) {
                 RingStat(
                     title: "Calories",
-                    value: Double(mealViewModel.totalCalories()),
+                    value: Double(max(Int(Double(mealViewModel.totalCalories()) - burn),0)),
                     goal: Double(userViewModel.goal?.dailyTargets.calories ?? 0),
                     color: .orange,
                     icon: "flame.fill",
@@ -163,7 +170,7 @@ struct DailyRings: View {
                 )
                 RingStat(
                     title: "Steps",
-                    value: Double(userViewModel.goal?.dailyTargets.steps ?? 0),
+                    value: Double(healthStore.steps ?? 0),
                     goal: Double(userViewModel.goal?.dailyTargets.steps ?? 0),
                     color: .green,
                     icon: "figure.walk",
@@ -277,11 +284,11 @@ struct MealCard: View {
 
 
 
-#Preview {
-    let mockContainer = try! ModelContainer(for: Meal.self) // only Meal needed for this view
-    let mockViewModel = MealsViewModel(context: mockContainer.mainContext)
-    
-    return DashboardView()
-        .environmentObject(mockViewModel)
-}
-
+//#Preview {
+//    let mockContainer = try! ModelContainer(for: Meal.self) // only Meal needed for this view
+//    let mockViewModel = MealsViewModel(context: mockContainer.mainContext)
+//
+//    return DashboardView()
+//        .environmentObject(mockViewModel)
+//}
+//

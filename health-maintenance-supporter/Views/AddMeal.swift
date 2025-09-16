@@ -4,8 +4,6 @@ import SwiftData
 struct AddMeal: View {
     @EnvironmentObject var foodItemViewModel: FoodItemViewModel
     
-
-    
     var body: some View {
         NavigationView {
             VStack {

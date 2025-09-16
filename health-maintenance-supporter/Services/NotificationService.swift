@@ -33,7 +33,7 @@ final class NotificatioNService {
     }
     
     func stopWaterReminder() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["waterReminders"])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["waterReminder"])
         print("Water reminder stopped")
     }
 }

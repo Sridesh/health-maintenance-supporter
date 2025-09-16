@@ -10,6 +10,7 @@ import SwiftData
 @Model
 class User{
     @Attribute(.unique) var email: String
+    var name: String
     var password: String
     var height: Int
     var gender: String
@@ -17,7 +18,8 @@ class User{
     var age: Int
     var isBiometricsAllowed : Bool
     
-    init(email: String, password: String, gender:String ,height: Int, weight: Int, age: Int,  isBiometricsAllowed: Bool) {
+    init(name:String, email: String, password: String, gender:String ,height: Int, weight: Int, age: Int,  isBiometricsAllowed: Bool) {
+        self.name = name
         self.email = email
         self.password = password
         self.isBiometricsAllowed = isBiometricsAllowed

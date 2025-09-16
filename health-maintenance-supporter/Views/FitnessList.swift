@@ -179,8 +179,11 @@ struct FitnessDetailView: View {
                     }
                     
                     Button("Select This"){
+                        print(plan.id)
                         userViewModel.currentUser.goalId = plan.id
+                        print("Goal ID set")
                         userViewModel.openModal = false
+                        
                         
                         if isInsideApp {
                             userViewModel.updateUserGoal(goalId: plan.id)

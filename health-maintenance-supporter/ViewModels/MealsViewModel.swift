@@ -13,15 +13,21 @@ final class MealsViewModel: ObservableObject {
     @Published var todayMealList: MealList?
     @Published var mealWindowOpen = false
     @Published var selectedMeal = ""
+    
+    private var dailyReport: DailyReport
 
+    
     init(context: ModelContext) {
         self.context = context
+        
+        dailyReport = DailyReportManager.getTodayReport(context: context)
+        
+        // Setup today's meal list
         setupTodayMealList()
     }
 
     // MARK: - Create or fetch today's meal list
     private func setupTodayMealList() {
-        print("Hellooooo")
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         
@@ -71,6 +77,14 @@ final class MealsViewModel: ObservableObject {
         
         meal.foodItems.append(food)
         context.insert(food)
+        
+        dailyReport.calorieTotal += food.calories
+            if let macros = food.macros {
+                dailyReport.macrosTotal.carbs += macros.carbs
+                dailyReport.macrosTotal.protein += macros.protein
+                dailyReport.macrosTotal.fats += macros.fats
+            }
+        
         saveContext()
     }
     
@@ -81,6 +95,15 @@ final class MealsViewModel: ObservableObject {
         
         meal.foodItems.removeAll { $0.id == food.id }
         context.delete(food)
+        
+        
+        dailyReport.calorieTotal -= food.calories
+            if let macros = food.macros {
+                dailyReport.macrosTotal.carbs -= macros.carbs
+                dailyReport.macrosTotal.protein -= macros.protein
+                dailyReport.macrosTotal.fats -= macros.fats
+            }
+        
         saveContext()
     }
     

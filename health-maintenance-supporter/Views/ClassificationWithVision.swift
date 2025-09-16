@@ -17,7 +17,10 @@ struct ClassificationWithVisionView: View {
     @State private var isLoading = false
     @State private var errorMessage: String = ""
     
+    @State private var isSheetOpen = false
+    
     @EnvironmentObject var foodItemViewModel : FoodItemViewModel
+    @EnvironmentObject var mealViewModel : MealsViewModel
 
     var body: some View {
         VStack(spacing: 20) {
@@ -55,14 +58,20 @@ struct ClassificationWithVisionView: View {
                     Text("Prediction: \(prediction)")
                         .font(.headline)
                         .foregroundColor(.primary)
-                    NavigationLink(destination:
-                        FoodItemDetails(portionSize: 200.00)
-                        .environmentObject(foodItemViewModel)
-                    ){
+                    
                         Button("Confirm") {
-                            
+                            let name = prediction.components(separatedBy: " (").first ?? prediction
+                            foodItemViewModel.changeSelectedFood(food: name)
+                            isSheetOpen = true
                         }
-                    }
+                        .padding()
+                        .background(Color.appPrimary)
+                        .cornerRadius(10)
+                        .sheet(isPresented: $isSheetOpen) {
+                            FoodItemDetails(portionSize: 100.0)
+                                .environmentObject(foodItemViewModel)
+                                .environmentObject(mealViewModel)
+                        }
                 }
             } else if !errorMessage.isEmpty {
                 Text("Error: \(errorMessage)")
@@ -71,10 +80,11 @@ struct ClassificationWithVisionView: View {
             }
         }
         .onAppear {
-    testModelLoading()
-}
+            testModelLoading()
+        }
         .padding()
         .frame(maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
         .background(Color.appSecondary.opacity(0.2))
         .photosPicker(isPresented: $isPickerPresented,
                       selection: Binding(get: { nil }, set: { newItem in
@@ -86,7 +96,7 @@ struct ClassificationWithVisionView: View {
         }))
     }
     
-    // MARK: - Model Testing
+
 // MARK: - Model Testing
 private func testModelLoading() {
     print("Testing model loading...")

@@ -29,11 +29,11 @@ struct FoodItemDetails: View {
     var body: some View {
         NavigationView{
             VStack{
-                Text(food.name)
+                Text(foodItemViewModel.selectedFood)
                     .font(.headline)
                     .padding(.bottom)
                 
-                Image("Apple")
+                Image(foodItemViewModel.selectedFood ?? "Meal")
                     .padding(.vertical)
                 
                 GlassCard{

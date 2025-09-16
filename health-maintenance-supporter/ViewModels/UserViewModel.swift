@@ -9,6 +9,7 @@ import SwiftUI
 import Firebase
 
 struct UserType {
+    var name: String
     var email: String
     var isMale: Bool
     var age: Int
@@ -19,7 +20,7 @@ struct UserType {
 
 @MainActor
 final class UserViewModel: ObservableObject {
-    @Published var currentUser = UserType(email: "", isMale: false, age: 0, weight: 0, height: 0, goalId: nil)
+    @Published var currentUser = UserType(name:"", email: "", isMale: false, age: 0, weight: 0, height: 0, goalId: nil)
     @Published var userOnboarded = false
     @Published var openModal = false
     @Published var goal : FitnessPlan?
@@ -47,6 +48,7 @@ final class UserViewModel: ObservableObject {
             print("DEBUG: Firestore data = \(data)")
             
             let user = UserType(
+                name: data["name"] as? String ?? "",
                 email: data["email"] as? String ?? "",
                 isMale: data["isMale"] as? Bool ?? false,
                 age: data["age"] as? Int ?? 0,
@@ -99,12 +101,13 @@ final class UserViewModel: ObservableObject {
             print("DEBUG: setMail -> \(self.currentUser)")
             
             let data: [String: Any] = [
+                "name": user.name,
                 "email": user.email,
                 "isMale": user.isMale,
                 "age": user.age,
                 "weight": user.weight,
                 "height": user.height,
-                "goalId": user.goalId ?? NSNull()
+                "goalId": currentUser.goalId ?? 1
                 ]
             
             if let document = snapshot?.documents.first {

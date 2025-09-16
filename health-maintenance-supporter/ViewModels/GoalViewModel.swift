@@ -14,14 +14,20 @@ final class GoalsViewModel: ObservableObject {
     
     @Published var waterIntake: Water?
     @Published var dailyGoals: [String] = []
+    @Published var completedPctg: Int = 0
     
     private let notificationService: NotificatioNService
     private let userViewModel : UserViewModel
+    
+    private var dailyReport : DailyReport
     
     init(context: ModelContext, userViewModel: UserViewModel, notificationService: NotificatioNService) {
         self.context = context
         self.userViewModel = userViewModel
         self.notificationService = notificationService
+        
+        dailyReport = DailyReportManager.getTodayReport(context: context)
+        
         setupWaterIntake()
     }
     
@@ -66,19 +72,25 @@ final class GoalsViewModel: ObservableObject {
         guard let water = waterIntake else { return }
         water.intake += amount
         
+        dailyReport.waterTotal += Int(amount)
+
         if waterIntake?.intake ?? 0 > userViewModel.goal?.dailyTargets.water ?? 0 {
             notificationService.stopWaterReminder()
-            print("Stopped")
-        } else {
-            print("Hello")
-        }
+        } 
         save()
     }
     
     // MARK: - Remove water intake
     func removeWaterIntake(amount: Double) {
         guard let water = waterIntake else { return }
-        water.intake = max(water.intake - amount, 0) // avoid negative intake
+        let actualRemoved = min(amount, water.intake) // avoid negative
+            water.intake -= actualRemoved
+
+        dailyReport.waterTotal = max(dailyReport.waterTotal - Int(actualRemoved), 0)
+        
+        if waterIntake?.intake ?? 0 < userViewModel.goal?.dailyTargets.water ?? 0 {
+            notificationService.scheduleWaterReminder()
+        }
         save()
     }
     
@@ -96,11 +108,14 @@ final class GoalsViewModel: ObservableObject {
             if !dailyGoals.contains(goal) { // avoid duplicates
                 dailyGoals.append(goal)
             }
+        
+        dailyReport.taskCompletion  = Double(dailyGoals.count /  (userViewModel.goal?.specialTargets.count ?? 1))
         }
     
     // MARK: - Remove a daily goal
     func removeGoal(_ goal: String) {
-            dailyGoals.removeAll { $0 == goal }
+        dailyGoals.removeAll { $0 == goal }
+        
+        dailyReport.taskCompletion  = Double(dailyGoals.count /  (userViewModel.goal?.specialTargets.count ?? 1))
         }
-    
 }

@@ -161,8 +161,9 @@ final class AuthenticationViewModel: ObservableObject {
     }
     
     //MARK: - add user data
-    func addUserData(gender:String, age:Int, weight:Int, height:Int){
+    func addUserData(name: String, gender:String, age:Int, weight:Int, height:Int){
         if self.user != nil {
+            self.user?.name = name
             self.user?.gender = gender
             self.user?.age = age
             self.user?.weight = weight

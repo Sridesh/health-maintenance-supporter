@@ -87,6 +87,8 @@ struct InsightsView: View {
                             PieChart(data: byCategory)
                         }.frame(width: 250)
                     }
+                    
+                    LastWeekInsights()
                 }
                 
                 

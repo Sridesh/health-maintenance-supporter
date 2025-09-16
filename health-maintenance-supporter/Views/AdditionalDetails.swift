@@ -15,6 +15,7 @@ struct AdditionalDetails: View {
     @State private var weight: String = ""
     @State private var height: String = ""
     @State private var goalId: String = ""
+    @State private var name: String = ""
     @State private var showAlert = false
 
     let genders = ["Male", "Female", "Other"]
@@ -67,9 +68,30 @@ struct AdditionalDetails: View {
     @ViewBuilder
     private func stepView() -> some View {
         switch step {
+            
         case 0:
             VStack(spacing: 20) {
-                Text("Select your gender")
+                Text("What name should we call you?")
+                    .font(.headline)
+                    .foregroundColor(.white)
+
+                TextField("Name", text: $name)
+                    .keyboardType(.default)
+                    .padding()
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                    .foregroundColor(.white)
+
+                nextButton()
+            }
+        
+        case 1:
+            VStack(spacing: 20) {
+                Text("Nice to know you \(name).")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text("What waas the gender assigned to you at birth?")
                     .font(.headline)
                     .foregroundColor(.white)
 
@@ -84,9 +106,9 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 1:
+        case 2:
             VStack(spacing: 20) {
-                Text("Enter your age")
+                Text("How old are you \(name)?")
                     .font(.headline)
                     .foregroundColor(.white)
 
@@ -100,7 +122,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 2:
+        case 3:
             VStack(spacing: 20) {
                 Text("Enter your weight (kg)")
                     .font(.headline)
@@ -116,7 +138,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 3:
+        case 4:
             VStack(spacing: 20) {
                 Text("Enter your height (cm)")
                     .font(.headline)
@@ -134,9 +156,92 @@ struct AdditionalDetails: View {
 
             }
             
-        case 4:
+        case 5:
             VStack{
+                
                 if userModel.currentUser.goalId != nil {
+                    ScrollView{
+                        VStack{
+                            Text("Thank you very much for you input, \(name)").frame(maxWidth: .infinity).foregroundColor(.appPrimary)
+                            Text("Please verify the below data, and click confirm to proceed.")
+                                .frame(maxWidth: .infinity).foregroundColor(.appPrimary)
+                            
+                            Divider().padding(.vertical)
+                            
+                            HStack{
+                                Text("Name")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                TextField("Name", text: $name)
+                                    .keyboardType(.default)
+                                    .frame(width:100)
+                                    .padding()
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                                    .foregroundColor(.white)
+                            }
+                            
+                            HStack{
+                                Text("Gender assigned to you at birth?")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Picker("Gender", selection: $gender) {
+                                    ForEach(genders, id: \.self) { g in
+                                        Text(g).tag(g)
+                                    }
+                                }
+                            }
+                            
+                            
+                            
+                            HStack{
+                                Text("Age")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                TextField("Age", text: $age)
+                                    .keyboardType(.numberPad)
+                                    .frame(width:50)
+                                    .padding()
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                                    .foregroundColor(.white)
+                                
+                            }
+                            
+                            HStack{
+                                Text("Weight (kg)")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                TextField("Weight", text: $weight)
+                                    .keyboardType(.decimalPad)
+                                    .frame(width:50)
+                                    .padding()
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                                    .foregroundColor(.white)
+                            }
+                            
+                            HStack{
+                                Text("Height (cm)")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Spacer()
+                                TextField("Height", text: $height)
+                                    .keyboardType(.decimalPad)
+                                    .frame(width:50)
+                                    .padding()
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                                    .foregroundColor(.white)
+                            }
+                        }.frame(height:500, alignment: .top)
+                    }
+                    Spacer()
+                    
                     Button(action: finishButtonTapped) {
                         Text("Finish")
                             .fontWeight(.semibold)
@@ -164,9 +269,10 @@ struct AdditionalDetails: View {
 
     private func nextButton() -> some View {
         Button(action: {
-            if step == 0 && gender.isEmpty ||
-                step == 1 && (age.isEmpty || Int(age) == nil) ||
-                step == 2 && (weight.isEmpty || Double(weight) == nil) {
+            if  step == 0 && name.isEmpty ||
+                step == 1 && gender.isEmpty ||
+                step == 2 && (age.isEmpty || Int(age) == nil) ||
+                step == 3 && (weight.isEmpty || Double(weight) == nil) {
                 showAlert = true
             } else {
                 step += 1
@@ -190,7 +296,7 @@ struct AdditionalDetails: View {
             return
         }
 
-        viewModel.addUserData(gender: gender, age: a, weight: Int(w), height: Int(h))
-        userModel.setUser(user: UserType(email: userModel.currentUser.email, isMale: gender == "Male", age: a, weight: w, height: h))
+        viewModel.addUserData(name:name.lowercased(), gender: gender, age: a, weight: Int(w), height: Int(h))
+        userModel.setUser(user: UserType(name:name.lowercased(), email: userModel.currentUser.email, isMale: gender == "Male", age: a, weight: w, height: h))
     }
 }

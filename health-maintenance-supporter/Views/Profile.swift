@@ -35,7 +35,7 @@ struct ProfileView:View {
                                     .frame(width: 50, height: 50)
                                     .padding(.vertical,0)
                                 Spacer()
-                                Text("Sridesh Fernando")
+                                Text(userViewModel.currentUser.name.capitalized)
                                     .font(.title2).bold()
                                 Spacer()
                             }

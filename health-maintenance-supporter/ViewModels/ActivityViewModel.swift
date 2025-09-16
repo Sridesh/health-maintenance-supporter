@@ -14,9 +14,13 @@ final class ActivityViewModel: ObservableObject {
     
     @Published var todayActivity: Activity?
     
+    private var dailyReport : DailyReport
+    
     init(context: ModelContext) {
         self.context = context
-        setupTodayActivity()
+        dailyReport = DailyReportManager.getTodayReport(context: context)
+        
+        setupTodayActivity()   
     }
     
     //MARK: -  Fetch today's activity
@@ -56,6 +60,7 @@ final class ActivityViewModel: ObservableObject {
             }
         }
     }
+    
     //MARK: -  update activity
     func updateTodayActivity(steps: Int? = nil, distance: Double? = nil, burn: Int? = nil) {
         print("Updating activity")
@@ -66,14 +71,17 @@ final class ActivityViewModel: ObservableObject {
         
         if let steps = steps {
             activity.steps = steps
+            dailyReport.stepsTotal = steps
         }
         
         if let distance = distance {
             activity.distance = distance
+            dailyReport.distanceTotal = Int(distance)
         }
         
         if let burn = burn {
             activity.burn = burn
+            dailyReport.calorieTotal = max(dailyReport.calorieTotal - burn, 0)
         }
         
         do {

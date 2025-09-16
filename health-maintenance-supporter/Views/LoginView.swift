@@ -111,13 +111,7 @@ struct SignInView: View {
                         }
                         .cornerRadius(14) // Optional: for tap area rounding
                         .shadow(radius: 8, y: 4)
-                        .alert(isPresented: $showAlert) {
-                            Alert(
-                                title: Text("Login"),
-                                message: Text("Login tapped!"),
-                                dismissButton: .default(Text("OK"))
-                            )
-                        }
+                      
                         
                     }
                     .padding(30)

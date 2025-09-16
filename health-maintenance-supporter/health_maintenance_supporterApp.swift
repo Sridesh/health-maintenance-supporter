@@ -17,7 +17,7 @@ struct health_maintenance_supporterApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @StateObject private var authViewModel: AuthenticationViewModel
+        @StateObject private var authViewModel: AuthenticationViewModel
         @StateObject private var mealViewModel: MealsViewModel
         @StateObject private var foodItemViewModel: FoodItemViewModel
         @StateObject private var userViewModel: UserViewModel
@@ -26,7 +26,10 @@ struct health_maintenance_supporterApp: App {
     
         @StateObject private var healthStore = HealthStore()
     
-    private let notificationService = NotificatioNService()
+        private let notificationService = NotificatioNService()
+        private let dailyReportManager = DailyReportManager()
+    
+        @State var showNextScreen = false
 
         
         let container: ModelContainer
@@ -41,7 +44,8 @@ struct health_maintenance_supporterApp: App {
             Food.self,
             Macro.self,
             Water.self,
-            Activity.self
+            Activity.self,
+            DailyReport.self
         )
         self.container = modelContainer
         
@@ -59,14 +63,6 @@ struct health_maintenance_supporterApp: App {
         ))
         _activityViewModel = StateObject(wrappedValue: ActivityViewModel(context: modelContainer.mainContext))
         
-        BGTaskScheduler.shared.register(
-            forTaskWithIdentifier: "com.myapp.hourlyBackup",
-            using: nil
-        ) { task in
-            BackupManager.shared.handleBackupTask(task: task as! BGAppRefreshTask)
-        }
-        BackupManager.shared.scheduleBackupTask()
-        
     }
 
     
@@ -74,34 +70,45 @@ struct health_maintenance_supporterApp: App {
     
     var body: some Scene {
         WindowGroup {
-            VStack{
-                if authViewModel.userSessionLogged && userViewModel.userOnboarded {
-                    if authViewModel.isAuthenticated  {
-                        TabsView()
-                            .environmentObject(goalViewModel)
-                            .environmentObject(userViewModel)
-                            .environmentObject(authViewModel)
-                            .environmentObject(mealViewModel)
-                            .environmentObject(foodItemViewModel)
-                            .environmentObject(activityViewModel)
+
+                VStack{
+                    
+                    if showNextScreen{
+                        VStack{
+                            if authViewModel.userSessionLogged && userViewModel.userOnboarded {
+                                if authViewModel.isAuthenticated  {
+                                    TabsView()
+                                        .environmentObject(goalViewModel)
+                                        .environmentObject(userViewModel)
+                                        .environmentObject(authViewModel)
+                                        .environmentObject(mealViewModel)
+                                        .environmentObject(foodItemViewModel)
+                                        .environmentObject(activityViewModel)
+                                } else {
+                                    FaceIDCollectionView()
+                                        .environmentObject(authViewModel)
+                                        .onAppear {
+                                            authViewModel.authenticateWithBiometrics()
+                                        }
+                                }
+                            } else if authViewModel.userSessionLogged && !userViewModel.userOnboarded {
+                                AdditionalDetails()
+                                    .environmentObject(userViewModel)
+                                    .environmentObject(authViewModel)
+                            }
+                            else {
+                                SignInView()
+                                    .environmentObject(authViewModel)
+                            }
+                        }
                     } else {
-                        FaceIDCollectionView()
-                            .environmentObject(authViewModel)
+                        SplashScreen()
                             .onAppear {
-                                authViewModel.authenticateWithBiometrics()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                    showNextScreen = true
+                                }
                             }
                     }
-                } else if authViewModel.userSessionLogged && !userViewModel.userOnboarded {
-                    AdditionalDetails()
-                        .environmentObject(userViewModel)
-                        .environmentObject(authViewModel)
-                }
-                else {
-                    SignInView()
-                        .environmentObject(authViewModel)
-                }
-                
-                    
             }.onAppear {
                 Auth.auth().addStateDidChangeListener { auth, user in
                     if let email = user?.email {
@@ -117,11 +124,16 @@ struct health_maintenance_supporterApp: App {
                                 burn: Int(healthStore.activeCalories + healthStore.basalCalories)
                             )
                         }
+                        
+                        DailyReportManager.backupOldReports(context:self.container.mainContext, email: email) { res in
+                            print("Backup successful")
+                        }
                     }
                 }
-                
                 notificationService.scheduleWaterReminder()
+                
             }
+
         }
     }
     
@@ -129,9 +141,15 @@ struct health_maintenance_supporterApp: App {
 
 }
 
+
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+            
+            BackupManager.shared.registerBackgroundTask()
+            BackupManager.shared.scheduleBackupTask()
+            
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if granted {
