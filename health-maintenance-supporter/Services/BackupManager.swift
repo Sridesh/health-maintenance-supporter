@@ -17,6 +17,8 @@ class BackupManager {
     private let taskIdentifier = "com.fitzy.hourlyBackup"
     private var isBackgroundTaskAvailable = false
     
+    var userViewModel: UserViewModel?
+    
     // MARK: - Register
     func registerBackgroundTask() {
         #if targetEnvironment(simulator)
@@ -112,24 +114,62 @@ class BackupManager {
     }
     
     // MARK: - Upload Backup
+//    func uploadBackup(completion: @escaping (Bool) -> Void) {
+//        let db = Firestore.firestore()
+//        let backupData: [String: Any] = [
+//            "timestamp": Timestamp(),
+//            "data": "Example backup data",
+//            "backupType": isBackgroundTaskAvailable ? "background" : "foreground"
+//        ]
+//        
+//        db.collection("backups").addDocument(data: backupData) { error in
+//            if let error = error {
+//                print("ERR: Backup upload failed: \(error.localizedDescription)")
+//                completion(false)
+//            } else {
+//                print("SUCCESS: Backup uploaded successfully")
+//                completion(true)
+//            }
+//        }
+//    }
+    
+    // MARK: - Upload Backup
     func uploadBackup(completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
-        let backupData: [String: Any] = [
-            "timestamp": Timestamp(),
-            "data": "Example backup data",
-            "backupType": isBackgroundTaskAvailable ? "background" : "foreground"
-        ]
-        
-        db.collection("backups").addDocument(data: backupData) { error in
-            if let error = error {
-                print("ERR: Backup upload failed: \(error.localizedDescription)")
+        Task { @MainActor in 
+            guard let email = userViewModel?.currentUser.email, !email.isEmpty else {
+                print("ERR: No email available for backup ID")
                 completion(false)
-            } else {
-                print("SUCCESS: Backup uploaded successfully")
-                completion(true)
+                return
             }
+            
+            // Use today's date as string
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let todayString = formatter.string(from: Date())
+            
+            let backupId = "\(todayString)-\(email)"
+            
+            let db = Firestore.firestore()
+            let backupData: [String: Any] = [
+                "timestamp": Timestamp(),
+                "data": "Example backup data",
+                "backupType": isBackgroundTaskAvailable ? "background" : "foreground"
+            ]
+            
+            db.collection("backups")
+                .document(backupId) // <- unique doc per day/email
+                .setData(backupData, merge: true) { error in
+                    if let error = error {
+                        print("ERR: Backup upload failed: \(error.localizedDescription)")
+                        completion(false)
+                    } else {
+                        print("SUCCESS: Backup stored for \(backupId)")
+                        completion(true)
+                    }
+                }
         }
     }
+
     
     // MARK: - Utility Methods
     func cancelAllPendingTasks() {

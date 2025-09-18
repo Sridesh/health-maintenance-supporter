@@ -21,7 +21,7 @@ struct Mealiew:View {
                 HStack {
                     Text(meal.selectedMeal)
                         .font(.title2.bold())
-                        .foregroundColor(.appText)
+         
                     
                     Spacer()
                     
@@ -40,7 +40,7 @@ struct Mealiew:View {
                 HStack(spacing: 10) {
                     Text("Total: \(totalCalories) kcal")
                         .font(.headline)
-                        .foregroundColor(.appText)
+
                     
                     Spacer()
                     

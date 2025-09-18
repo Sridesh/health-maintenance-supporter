@@ -56,7 +56,7 @@ struct FoodIntakeView: View {
                 }
                 .padding(7)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(Color.appWhiteText)
                 .background(Color.appSecondary)
                 .cornerRadius(10)
             }

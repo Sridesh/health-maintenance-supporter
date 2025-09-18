@@ -11,7 +11,7 @@ struct AddMeal: View {
                     .padding()
                 
                     VStack{
-                        Text("Manually search for food").font(.headline).foregroundColor(.appText).frame(maxWidth: .infinity, alignment: .leading)
+                        Text("Manually search for food").font(.headline).frame(maxWidth: .infinity, alignment: .leading)
                         FoodSearch()
                             .environmentObject(foodItemViewModel)
                             .padding(.bottom)
@@ -24,7 +24,7 @@ struct AddMeal: View {
                             .foregroundColor(Color.appPrimary)
                         
                         VStack{
-                            Text("Identify nutritions with AI").font(.headline).foregroundColor(.appText).frame(maxWidth: .infinity, alignment: .leading)
+                            Text("Identify nutritions with AI").font(.headline).frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
                                 NavigationLink(destination: CameraClassificationView().environmentObject(foodItemViewModel)) {
                                     VStack {
@@ -38,9 +38,9 @@ struct AddMeal: View {
                                     }
                                     .padding()
                                     .frame(width: 150)
-                                    .background(Color.white)
+                                    .background(Color.appWhiteText)
                                     .cornerRadius(10)
-                                    .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
+                                    .shadow(color: Color.appBackgound, radius: 10)
                                     .padding(.trailing)
                                 }
                                 NavigationLink(destination: ClassificationWithVisionView().environmentObject(foodItemViewModel)){
@@ -55,7 +55,7 @@ struct AddMeal: View {
                                     }
                                     .padding()
                                     .frame(width: 150)
-                                    .background(Color.white)
+                                    .background(Color.appWhiteText)
                                     .cornerRadius(10)
                                     .shadow(color: Color.appPrimary.opacity(0.2), radius: 10)
                                 }
@@ -70,7 +70,7 @@ struct AddMeal: View {
                             Text("Recent")
                                 .padding(10)
                                 .background(Color.appSecondary)
-                                .foregroundColor(.white)
+                                .foregroundColor(.appWhiteText)
                                 .bold()
                                 .cornerRadius(50)
                                 .padding(.top)

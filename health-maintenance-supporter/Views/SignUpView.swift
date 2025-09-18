@@ -28,7 +28,7 @@ struct SignupView: View {
         NavigationView {
             ZStack {
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
+                    gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.5)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -132,7 +132,6 @@ struct SignupView: View {
                             .foregroundColor(Color.appText.opacity(0.7))
                         NavigationLink(destination: SignInView().environmentObject(authViewModel)) {
                             Text("Sign In")
-                                .foregroundColor(Color.appText)
                                 .fontWeight(.bold)
                         }
                         .foregroundColor(Color.appText.opacity(0.7))

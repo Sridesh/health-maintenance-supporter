@@ -30,18 +30,5 @@ final class AuthenticationSerice{
                 } else {
                     completion(false, "Biometric authentication not available")
                 }
-        
-        //        if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
-        //            context.evaluatePolicy(.deviceOwnerAuthentication,
-        //                                   localizedReason: "Authenticate to continue") { success, authenticationError in
-        //                DispatchQueue.main.async {
-        //                    text = success ? "UNLOCKED" : "Authentication failed"
-        //                }
-        //            }
-        //        } else {
-        //            DispatchQueue.main.async {
-        //                text = "Biometrics/Passcode not available"
-        //            }
-        //        }
     }
 }

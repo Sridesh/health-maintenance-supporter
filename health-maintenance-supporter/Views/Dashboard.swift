@@ -36,7 +36,7 @@ struct DashboardView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                gradient: Gradient(colors: [Color.appPrimary.opacity(0.33), Color.appSecondary.opacity(0.20)]),
+                gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.20)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -83,9 +83,8 @@ struct DashboardView: View {
                                 MacroStat(name: "Protein", value: mealViewModel.totalMacros().protein, goal: Double(userViewModel.goal?.dailyTargets.macros.protein ?? 1), color: .green)
                                 MacroStat(name: "Carbs", value: mealViewModel.totalMacros().carbs, goal: Double(userViewModel.goal?.dailyTargets.macros.carbs ?? 1), color: .orange)
                                 MacroStat(name: "Fat", value: mealViewModel.totalMacros().fats, goal: Double(userViewModel.goal?.dailyTargets.macros.fats ?? 1), color: .red)
-                                MacroStat(name: "Fiber", value: 15, goal: 30, color: .purple)
                             }
-                        }
+                        }.frame(maxWidth: .infinity)
                     }
                     
                     // Meals Section
@@ -157,7 +156,7 @@ struct DailyRings: View {
                 .padding(.bottom)
                 .font(.title3)
                 .bold()
-                .foregroundColor(Color.appText)
+           
             
             HStack(spacing: 28) {
                 RingStat(
@@ -168,6 +167,7 @@ struct DailyRings: View {
                     icon: "flame.fill",
                     progress: animateRings ? CGFloat(Double(mealViewModel.totalCalories())  /  (Double(userViewModel.goal?.dailyTargets.calories ?? 1))) : 0
                 )
+                .accessibilityLabel("Calorie intake")
                 RingStat(
                     title: "Steps",
                     value: Double(healthStore.steps ?? 0),
@@ -176,6 +176,7 @@ struct DailyRings: View {
                     icon: "figure.walk",
                     progress: animateRings ? CGFloat(Double(activityViewModel.todayActivity?.steps ?? 0)  /  (Double(userViewModel.goal?.dailyTargets.steps ?? 1))) : 0
                 )
+                .accessibilityLabel("Steps today")
                 RingStat(
                     title: "Water",
                     value: goalViewModel.waterIntake?.intake ?? 0,
@@ -184,6 +185,7 @@ struct DailyRings: View {
                     icon: "drop.fill",
                     progress: animateRings ? CGFloat((goalViewModel.waterIntake?.intake ?? 0) / (Double(userViewModel.goal?.dailyTargets.water ?? 1))) : 0
                 )
+                .accessibilityLabel("Water intake")
             }
             .onAppear { animateRings = true
                 
@@ -225,7 +227,6 @@ struct RingStat: View {
                 .font(.caption)
                 .foregroundColor(Color.appSecondary)
             Text(title == "Water" ? String(format: "%.1fL", value) : "\(Int(value))")
-                .foregroundColor(Color.appText)
                 .font(.headline)
                 .bold()
             Text("\(Int(progress * 100))%")

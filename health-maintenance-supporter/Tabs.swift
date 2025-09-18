@@ -22,7 +22,7 @@ struct TabsView: View {
         
         ZStack{
             LinearGradient(
-                gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
+                gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.5)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -37,6 +37,11 @@ struct TabsView: View {
                     .environmentObject(activityViewModel)
                     .environmentObject(foodItemViewModel)
                     .tabItem{Label("Home", systemImage:"house")}
+                
+                AdditionsView()
+                    .environmentObject(userViewModel)
+                    .environmentObject(mealViewModel)
+                    .tabItem{Label("Inputs", systemImage: "figure.walk")}
 
                 InsightsView()
                     .environmentObject(goalViewModel)
@@ -44,15 +49,13 @@ struct TabsView: View {
                     .environmentObject(mealViewModel)
                     .environmentObject(goalViewModel)
                     .tabItem{Label("Insights", systemImage: "chart.bar.horizontal.page")}
-                
-                AdditionsView()
-                    .environmentObject(userViewModel)
-                    .environmentObject(mealViewModel)
-                    .tabItem{Label("Details", systemImage: "figure.walk")}
-                
-//                SignupView()
+
                 ProfileView()
                     .environmentObject(authentication)
+                    .environmentObject(goalViewModel)
+                    .environmentObject(userViewModel)
+                    .environmentObject(mealViewModel)
+                    .environmentObject(activityViewModel)
                     .environmentObject(foodItemViewModel)
                     .tabItem {Label("Profile", systemImage: "person.circle")}
                 

@@ -157,4 +157,47 @@ final class MealsViewModel: ObservableObject {
         
         return (totalCalories, totalGrams)
     }
+        
+        //MARK: - reset all data on logout
+        func onLogout() {
+            //Fetch all MealList objects
+            let fetchMealLists = FetchDescriptor<MealList>()
+            do {
+                let mealLists = try context.fetch(fetchMealLists)
+                
+                // Delete all MealLists
+                for mealList in mealLists {
+                    context.delete(mealList)
+                }
+                
+                //delete Food objects
+                let fetchFoods = FetchDescriptor<Food>()
+                let foods = try context.fetch(fetchFoods)
+                for food in foods {
+                    context.delete(food)
+                }
+      
+                try context.save()
+                
+
+                todayMealList = nil
+                selectedMeal = ""
+                mealWindowOpen = false
+                dailyReport = DailyReport(
+                    date: Date(),
+                    calorieTotal: 0,
+                    stepsTotal: 0,
+                    waterTotal: 0,
+                    distanceTotal: 0,
+                    macrosTotal: Macro(carbs: 0, protein: 0, fats: 0),
+                    taskCompletion: 0
+                )
+                
+                print("All meal data successfully deleted and ViewModel reset.")
+                
+            } catch {
+                print("Failed to reset data: \(error)")
+            }
+        }
+
 }

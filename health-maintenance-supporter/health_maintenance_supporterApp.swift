@@ -55,6 +55,9 @@ struct health_maintenance_supporterApp: App {
         
         let userVM = UserViewModel()
         _userViewModel = StateObject(wrappedValue: userVM)
+        
+        BackupManager.shared.userViewModel = userVM
+        
         let notificationService = NotificatioNService()
         _goalViewModel = StateObject(wrappedValue: GoalsViewModel(
             context: modelContainer.mainContext,
@@ -112,6 +115,7 @@ struct health_maintenance_supporterApp: App {
             }.onAppear {
                 Auth.auth().addStateDidChangeListener { auth, user in
                     if let email = user?.email {
+                        print("SUCCESS: \(email)")
                         userViewModel.setMail(email: email)
                         userViewModel.fetchUser(email: email)
                         userViewModel.userName = user?.displayName ?? "Sridesh"

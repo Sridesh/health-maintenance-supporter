@@ -18,7 +18,6 @@ struct IntakeItem:View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(name)
                         .font(.headline)
-                        .foregroundColor(.appText)
                     
                     HStack(spacing: 12) {
                         HStack(spacing: 2) {

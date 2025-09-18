@@ -183,6 +183,27 @@ final class AuthenticationViewModel: ObservableObject {
     func saveUser(){
         try? context.save()
     }
+    
+    
+    //MARK: - reset on logout
+    func onLogout() {
+        firebaseService.FBLogout()
+        
+
+        if let currentUser = self.user {
+            context.delete(currentUser)
+            try? context.save()
+            self.user = nil
+        }
+
+        self.isAuthenticated = false
+        self.userSessionLogged = false
+        self.loginError = false
+        
+        self.flowState = .onboarding
+        
+        print("AuthenticationViewModel: User logged out and state reset")
+    }
 
 }
 

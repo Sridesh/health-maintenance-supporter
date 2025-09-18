@@ -71,6 +71,7 @@ struct WaterIntake: View {
                     }
                     .frame(width: 90, height: 90)
                     .onAppear { animateProgress = true }
+                    .accessibilityLabel("Water intake")
                     
                     // Intake Buttons
                     VStack(alignment: .leading, spacing: 10) {
@@ -83,10 +84,14 @@ struct WaterIntake: View {
                                 .onTapGesture {
                                     goalViewModel.removeWaterIntake(amount: 0.07) // in liters
                                 }
+                                .accessibilityLabel("Add water intake")
+                                .accessibilityHint("Adds 70ml of water to your daily goal")
                             IntakeButton(title: "+70ml", color: Color.appGreen.opacity(0.25), border: Color.appGreen)
                                 .onTapGesture {
                                     goalViewModel.addWaterIntake(amount: 0.07)
                                 }
+                                .accessibilityLabel("Remove water intake")
+                                .accessibilityHint("Removes 70ml of water to your daily goal")
                         }
                         
                         Divider().padding(.vertical)

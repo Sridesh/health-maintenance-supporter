@@ -23,26 +23,26 @@ struct InsightsView: View {
     @State var isAddIntakeOpen = false
     @State var customValue = ""
     var waterProgress: CGFloat {
-            guard let dailyGoal = userViewModel.goal?.dailyTargets.water, dailyGoal > 0 else { return 0 }
+        guard let dailyGoal = userViewModel.goal?.dailyTargets.water, dailyGoal > 0 else { return 0 }
         return CGFloat(goalViewModel.waterIntake?.intake ?? 0 / dailyGoal)
-        }
+    }
     @State private var animateProgress = false
     
     private var byCategory: [NutritionCount] {
-            let macros = mealViewModel.totalMacros()
-            return [
-                .init(category: "Fat", count: Int(macros.fats)),
-                .init(category: "Protein", count: Int(macros.protein)),
-                .init(category: "Carbs", count: Int(macros.carbs))
-                // .init(category: "Fiber", count: 15),
-            ]
-        }
+        let macros = mealViewModel.totalMacros()
+        return [
+            .init(category: "Fat", count: Int(macros.fats)),
+            .init(category: "Protein", count: Int(macros.protein)),
+            .init(category: "Carbs", count: Int(macros.carbs))
+            // .init(category: "Fiber", count: 15),
+        ]
+    }
     
     var body: some View {
         ZStack {
             
             LinearGradient(
-                gradient: Gradient(colors: [Color(.systemBlue).opacity(0.13), Color(.systemPurple).opacity(0.10)]),
+                gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.20)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -50,18 +50,22 @@ struct InsightsView: View {
             
             
             // MARK: - content
-            VStack(spacing: 20) {
-                HStack{
 
-                    VStack{
-                        Text("Insight Tracker")
-                            .font(.headline)
-                            .padding(.top)
-                            .padding(.horizontal, 30)
-                    }
-                }.frame(maxWidth: .infinity, alignment: .leading)
-                
-                GlassCard {
+                VStack(spacing: 20) {
+                    HStack{
+                        
+                        VStack{
+                            Text("Insight Tracker")
+                                .font(.title2)
+                                .foregroundColor(Color.appSecondary)
+                                .bold()
+                                .padding(.top)
+                                .padding(.horizontal, 30)
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    ScrollView{
+                    
                     VStack{
                         HStack{
                             ZStack {
@@ -74,28 +78,55 @@ struct InsightsView: View {
                                 
                             }
                             VStack{
-                                Text("Nutritions")
+                                Text("Nutritions - Today")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .font(.headline)
                                 Text("Today’s macros")
+                                    .bold()
                                     .font(.caption)
                                     .foregroundStyle(Color.appSecondary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }.frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        VStack{
-                            PieChart(data: byCategory)
-                        }.frame(width: 250)
+                        
+                        GlassCard {
+                            VStack{
+                                PieChart(data: byCategory)
+                            }.frame(width: 250)
+                        }
                     }
-                    
-                    LastWeekInsights()
+                        
+                        Divider().padding(.vertical)
+                        
+                    VStack{
+                        HStack{
+                            ZStack {
+                                Circle()
+                                    .fill(LinearGradient(colors: [Color.appPrimary, Color.appSecondary], startPoint: .top, endPoint: .bottomTrailing))
+                                    .frame(width: 44, height: 44)
+                                Image(systemName: "leaf.fill")
+                                    .foregroundColor(.white)
+                                    .font(.title2)
+                                
+                            }
+                            VStack{
+                                Text("Past Week")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .font(.headline)
+                                Text("Your Progress in the past week")
+                                    .bold()
+                                    .font(.caption)
+                                    .foregroundStyle(Color.appSecondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }.frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        
+                        LastWeekInsights()
+                    }
                 }
-                
-                
-                
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding()
             }
-            .frame(maxHeight: .infinity, alignment: .top)
-            .padding()
         }
-        
-    }}
+    }
+}

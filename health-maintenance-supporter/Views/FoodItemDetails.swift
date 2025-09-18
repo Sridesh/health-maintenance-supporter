@@ -16,6 +16,7 @@ struct FoodItemDetails: View {
     @EnvironmentObject var mealViewModel : MealsViewModel
     
     @State private var quantity: Int = 100
+    @State private var isAdded : Bool = false
 
     private var food: FruitMacro {
             getFruitMacro(by: foodItemViewModel.selectedFood) ?? fruitMacros[0]
@@ -99,9 +100,19 @@ struct FoodItemDetails: View {
                         grams: quantity,
                         macros: scaledMacros
                     )
+                    
+                    isAdded = true
 
                     mealViewModel.addFood(to: foodItemViewModel.selectedMeal, food: newFood)
-                }.padding()
+                }
+                .alert(isPresented: $isAdded) {
+                    Alert(
+                        title: Text("Success"),
+                        message: Text("Item added successfully"),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+                .padding()
                     .frame(maxWidth: .infinity)
                     .background(Color.appPrimary)
                     .foregroundColor(.white)

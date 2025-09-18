@@ -12,9 +12,7 @@ struct FoodSearch: View {
     @State private var searchText = ""
 
     let allFoods : [String] = [
-        "Apple", "Banana", "Chicken Breast", "Oatmeal", "Greek Yogurt",
-        "Salmon", "Broccoli", "Rice", "Eggs", "Almonds",
-        "Avocado", "Spinach", "Sweet Potato", "Tofu", "Quinoa"
+        "Apple", "Banana", "Orange", "Dragon Fruit", "Mango", "Pineapple", "Papaya", "Cherry"
     ]
 
     var filteredFoods: [String] {
@@ -34,7 +32,7 @@ struct FoodSearch: View {
 
                 TextField("Search food...", text: $searchText)
                     .padding(10)
-                    .background(Color.white.opacity(0.3))
+                    .background(Color.appWhiteText.opacity(0.3))
                     .cornerRadius(8)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
@@ -69,7 +67,7 @@ struct FoodSearch: View {
                             }
                             .padding(.vertical, 6)
                             .padding(.horizontal)
-                            .background(Color.white.opacity(0.1))
+                            .background(Color.appWhiteText.opacity(0.1))
                         }
                     }
                 }
@@ -78,7 +76,7 @@ struct FoodSearch: View {
                 }.onDisappear{
                     foodItemViewModel.searching = false
                 }
-                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1)))
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color.appWhiteText.opacity(0.1)))
                 .padding(.horizontal)
             }
         }

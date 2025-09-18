@@ -17,6 +17,8 @@ struct AdditionalDetails: View {
     @State private var goalId: String = ""
     @State private var name: String = ""
     @State private var showAlert = false
+    
+    @State var navigateToCarousel = false
 
     let genders = ["Male", "Female", "Other"]
 
@@ -24,7 +26,7 @@ struct AdditionalDetails: View {
         NavigationView {
             ZStack {
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
+                    gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.5)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -51,7 +53,7 @@ struct AdditionalDetails: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 30))
                     .overlay(
                         RoundedRectangle(cornerRadius: 30)
-                            .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                            .stroke(Color.appWhiteText.opacity(0.15), lineWidth: 1)
                     )
                     .shadow(color: .black.opacity(0.2), radius: 30, y: 10)
 
@@ -73,14 +75,14 @@ struct AdditionalDetails: View {
             VStack(spacing: 20) {
                 Text("What name should we call you?")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(.appWhiteText)
 
                 TextField("Name", text: $name)
                     .keyboardType(.default)
                     .padding()
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
-                    .foregroundColor(.white)
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appWhiteText.opacity(0.2)))
+                    .foregroundColor(.appWhiteText)
 
                 nextButton()
             }
@@ -89,11 +91,11 @@ struct AdditionalDetails: View {
             VStack(spacing: 20) {
                 Text("Nice to know you \(name).")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(.appWhiteText)
                 
                 Text("What waas the gender assigned to you at birth?")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(.appWhiteText)
 
                 Picker("Gender", selection: $gender) {
                     ForEach(genders, id: \.self) { g in
@@ -110,13 +112,13 @@ struct AdditionalDetails: View {
             VStack(spacing: 20) {
                 Text("How old are you \(name)?")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(.appWhiteText)
 
                 TextField("Age", text: $age)
                     .keyboardType(.numberPad)
                     .padding()
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.appWhiteText.opacity(0.2)))
                     .foregroundColor(.white)
 
                 nextButton()
@@ -242,15 +244,20 @@ struct AdditionalDetails: View {
                     }
                     Spacer()
                     
-                    Button(action: finishButtonTapped) {
-                        Text("Finish")
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(LinearGradient(colors: [Color.appPrimary, Color.appPrimary], startPoint: .leading, endPoint: .trailing))
-                            .foregroundColor(.white)
-                            .cornerRadius(14)
-                            .shadow(radius: 8, y: 4)
+                    NavigationLink(destination: OnboardCarouselView().environmentObject(userModel)){
+                        Button(action: {
+                            finishButtonTapped()
+                            navigateToCarousel = true
+                        }) {
+                            Text("Finish")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(LinearGradient(colors: [Color.appPrimary, Color.appPrimary], startPoint: .leading, endPoint: .trailing))
+                                .foregroundColor(.white)
+                                .cornerRadius(14)
+                                .shadow(radius: 8, y: 4)
+                        }
                     }
                 } else {
                     FitnessListView(isInside:false)
@@ -259,6 +266,13 @@ struct AdditionalDetails: View {
             }
             .frame(height: 500)
             .background(Color.clear)
+            
+            NavigationLink(
+                destination: OnboardCarouselView().environmentObject(userModel),
+                isActive: $navigateToCarousel
+            ) {
+                EmptyView()
+            }
             
 
 
@@ -297,6 +311,6 @@ struct AdditionalDetails: View {
         }
 
         viewModel.addUserData(name:name.lowercased(), gender: gender, age: a, weight: Int(w), height: Int(h))
-        userModel.setUser(user: UserType(name:name.lowercased(), email: userModel.currentUser.email, isMale: gender == "Male", age: a, weight: w, height: h))
+        userModel.setUser(user: UserType(name:name.lowercased(), email: userModel.currentUser.email, isMale: gender == "Male", age: a, weight: w, height: h, onboarded: false))
     }
 }

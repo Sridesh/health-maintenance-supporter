@@ -24,7 +24,7 @@ struct AdditionsView: View {
     var body: some View {
         ZStack{
             LinearGradient(
-                gradient: Gradient(colors: [Color.appPrimary.opacity(0.33), Color.appSecondary.opacity(0.20)]),
+                gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.20)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )

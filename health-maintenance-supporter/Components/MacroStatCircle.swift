@@ -32,7 +32,6 @@ struct MacroStat: View {
             .frame(width: 60)
             Text("\(Int(value))/\(Int(goal))")
                 .font(.system(size: 16))
-                .foregroundColor(Color.appText)
         }
         .frame(width: 70)
     }

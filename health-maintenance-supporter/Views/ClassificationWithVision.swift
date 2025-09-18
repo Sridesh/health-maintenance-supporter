@@ -44,7 +44,7 @@ struct ClassificationWithVisionView: View {
 //            .buttonStyle(.borderedProminent)
             .padding()
             .background(Color.appSecondary)
-            .foregroundColor(.white)
+            .foregroundColor(.appWhiteText)
             .cornerRadius(10)
             .disabled(isLoading)
             
@@ -76,7 +76,7 @@ struct ClassificationWithVisionView: View {
             } else if !errorMessage.isEmpty {
                 Text("Error: \(errorMessage)")
                     .font(.caption)
-                    .foregroundColor(.red)
+                    .foregroundColor(Color.clear)
             }
         }
         .onAppear {

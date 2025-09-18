@@ -111,7 +111,7 @@ struct ClassifierView: View {
                 print("✅ Generated class loaded and Vision model created successfully")
             }
         } catch {
-            print("❌ Model loading failed: \(error)")
+            print("Model loading failed: \(error)")
         }
     }
 

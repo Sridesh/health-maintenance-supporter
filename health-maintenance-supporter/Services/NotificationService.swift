@@ -17,7 +17,7 @@ final class NotificatioNService {
         content.sound = UNNotificationSound.default
         
         // Trigger after 5 seconds
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60*3, repeats: true)
         
         let request = UNNotificationRequest(identifier: "waterReminder",
                                             content: content,

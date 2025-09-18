@@ -118,4 +118,36 @@ final class GoalsViewModel: ObservableObject {
         
         dailyReport.taskCompletion  = Double(dailyGoals.count /  (userViewModel.goal?.specialTargets.count ?? 1))
         }
+    // MARK: - Reset on logout
+    func onLogout() {
+            if let water = waterIntake {
+                context.delete(water)
+                waterIntake = nil
+            }
+            
+            // Reset daily goals
+            dailyGoals.removeAll()
+            completedPctg = 0
+            
+            // Reset daily report
+            dailyReport = DailyReport(
+                date: Date(),
+                calorieTotal: 0,
+                stepsTotal: 0,
+                waterTotal: 0,
+                distanceTotal: 0,
+                macrosTotal: Macro(carbs: 0, protein: 0, fats: 0),
+                taskCompletion: 0
+            )
+            
+            //Stopwater reminders
+            notificationService.stopWaterReminder()
+
+            do {
+                try context.save()
+                print("GoalsViewModel: All data reset successfully.")
+            } catch {
+                print("GoalsViewModel: Failed to reset data: \(error)")
+            }
+        }
 }

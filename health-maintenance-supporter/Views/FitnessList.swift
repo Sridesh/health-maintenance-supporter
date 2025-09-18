@@ -46,7 +46,7 @@ struct FitnessCard: View {
             RoundedRectangle(cornerRadius: 25)
                 .fill(
                     LinearGradient(
-                        colors: [Color.appPrimary.opacity(0.7), Color.appSecondary.opacity(0.6)],
+                        colors: [Color.appBackgound, Color.appSecondary.opacity(0.6)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -92,10 +92,10 @@ struct StatChip: View {
         HStack(spacing: 6) {
             Image(systemName: icon)
                 .font(.caption)
-                .foregroundStyle(Color.appText)
+            
             Text(value)
                 .font(.caption)
-                .foregroundStyle(Color.appText)
+           
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)

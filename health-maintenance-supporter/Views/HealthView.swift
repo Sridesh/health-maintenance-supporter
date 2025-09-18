@@ -91,7 +91,7 @@ struct HealthView: View {
                                 .interpolationMethod(.catmullRom)
                                 .foregroundStyle(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [Color.appPrimary.opacity(0.3), Color.appBlue.opacity(0.2)]),
+                                        gradient: Gradient(colors: [Color.appBackgound, Color.appBlue.opacity(0.2)]),
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )

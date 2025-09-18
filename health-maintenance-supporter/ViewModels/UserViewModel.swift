@@ -16,11 +16,12 @@ struct UserType {
     var weight: Double
     var height: Double
     var goalId: Int?
+    var onboarded: Bool
 }
 
 @MainActor
 final class UserViewModel: ObservableObject {
-    @Published var currentUser = UserType(name:"", email: "", isMale: false, age: 0, weight: 0, height: 0, goalId: nil)
+    @Published var currentUser = UserType(name:"", email: "", isMale: false, age: 0, weight: 0, height: 0, goalId: nil, onboarded: false)
     @Published var userOnboarded = false
     @Published var openModal = false
     @Published var goal : FitnessPlan?
@@ -54,7 +55,8 @@ final class UserViewModel: ObservableObject {
                 age: data["age"] as? Int ?? 0,
                 weight: data["weight"] as? Double ?? 0.0,
                 height: data["height"] as? Double ?? 0.0,
-                goalId: data["goalId"] as? Int
+                goalId: data["goalId"] as? Int,
+                onboarded: data["onboarded"] as? Bool ?? true
             )
             
             print("DEBUG: Final user.goalId = \(user.goalId ?? -1)")
@@ -107,7 +109,8 @@ final class UserViewModel: ObservableObject {
                 "age": user.age,
                 "weight": user.weight,
                 "height": user.height,
-                "goalId": currentUser.goalId ?? 1
+                "goalId": currentUser.goalId ?? 1,
+                "onboarded" : false
                 ]
             
             if let document = snapshot?.documents.first {
@@ -119,7 +122,7 @@ final class UserViewModel: ObservableObject {
                         print("User updated successfully")
                         DispatchQueue.main.async {
                             self.currentUser = user
-                            self.userOnboarded = true
+                            self.userOnboarded = false
                         }
                     }
                 }
@@ -132,7 +135,6 @@ final class UserViewModel: ObservableObject {
                         print("User created successfully")
                         DispatchQueue.main.async {
                             self.currentUser = user
-                            self.userOnboarded = true
                         }
                     }
                 }
@@ -230,6 +232,8 @@ final class UserViewModel: ObservableObject {
                         // Also update the goal object to keep UI in sync
                         if let selectedPlan = fitnessPlans.first(where: { $0.id == goalId }) {
                             self.goal = selectedPlan
+                        } else {
+                            self.goal = fitnessPlans[2]
                         }
                         
                         print("goalId updated successfully in Firestore")
@@ -238,5 +242,63 @@ final class UserViewModel: ObservableObject {
             }
         }
     }
+    
+    func updateUserOnboarding() {
+        let email = self.currentUser.email
+        let usersRef = db.collection("Users")
+        
+        // Query to find the document with the matching email (same pattern as your other methods)
+        usersRef.whereField("email", isEqualTo: email).getDocuments { [weak self] snapshot, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error finding user: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let document = snapshot?.documents.first else {
+                print("No user found with email \(email)")
+                return
+            }
+            
+            usersRef.document(document.documentID).updateData([
+                "onboarded": true
+            ]) { error in
+                if let error = error {
+                    print("Error updating goalId: \(error.localizedDescription)")
+                } else {
+                    DispatchQueue.main.async {
+                        self.currentUser.onboarded = true
+                        
+                        print("onboarding updated successfully in Firestore")
+                        self.userOnboarded = true
+                    }
+                }
+            }
+        }
+    }
+    
+    //MARK: - Reset on ogout
+    func onLogout() {
+        // Reset all published properties
+        currentUser = UserType(
+            name: "",
+            email: "",
+            isMale: false,
+            age: 0,
+            weight: 0,
+            height: 0,
+            goalId: nil,
+            onboarded: false
+        )
+        
+        userOnboarded = false
+        openModal = false
+        goal = nil
+        userName = ""
+        
+        print("UserViewModel: All user data reset.")
+    }
+    
 }
 

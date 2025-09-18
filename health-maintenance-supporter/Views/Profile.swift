@@ -9,17 +9,22 @@ import SwiftUI
 
 struct ProfileView:View {
     @EnvironmentObject var session: AuthenticationViewModel
-    @EnvironmentObject var userViewModel : UserViewModel
+    @EnvironmentObject var mealViewModel: MealsViewModel
+    @EnvironmentObject var userViewModel: UserViewModel
+    @EnvironmentObject var goalViewModel: GoalsViewModel
+    @EnvironmentObject var activityViewModel: ActivityViewModel
+    @EnvironmentObject var foodItemViewModel: FoodItemViewModel
     
     @State private var isShowingSheet = false
     @State private var isGoalShowingSheet = false
+    @State private var isDarkMode = false
 
     var body: some View {
         NavigationView {
             
             ZStack{
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.appPrimary.opacity(0.33), Color.appSecondary.opacity(0.20)]),
+                    gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.20)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -27,6 +32,7 @@ struct ProfileView:View {
                 
                 VStack{
                     ScrollView{
+                        
                         VStack(spacing: 20){
                             HStack{
                                 Spacer()
@@ -55,24 +61,31 @@ struct ProfileView:View {
                             HStack{
                                 Spacer()
                                 VStack{
-                                    Text("\(userViewModel.currentUser.age)").foregroundColor(.white).bold()
-                                    Text("Current Age").font(.caption).foregroundColor(.white.opacity(0.5))
+                                    Text("\(userViewModel.currentUser.age)").foregroundColor(.appWhiteText).bold()
+                                    Text("Current Age").font(.caption).bold().foregroundColor(.appWhiteText.opacity(0.5))
                                 }
                                 Spacer()
                                 VStack{
-                                    Text("\(userViewModel.currentUser.isMale ? "Male" : "Female")").foregroundColor(.white).bold()
-                                    Text("Gender").font(.caption).foregroundColor(.white.opacity(0.5))
+                                    Text("\(userViewModel.currentUser.isMale ? "Male" : "Female")").foregroundColor(.appWhiteText).bold()
+                                    Text("Gender").font(.caption).bold().foregroundColor(.appWhiteText.opacity(0.5))
                                 }
                                 Spacer()
                                 VStack{
-                                    Text("\(Int(userViewModel.getBMI()))").foregroundColor(.white).bold()
-                                    Text("Current BMI").font(.caption).foregroundColor(.white.opacity(0.5))
+                                    Text("\(Int(userViewModel.getBMI()))").foregroundColor(.appWhiteText).bold()
+                                    Text("Current BMI").font(.caption).bold().foregroundColor(.appWhiteText.opacity(0.5))
                                 }
                                 Spacer()
                             }.frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.appPrimary)
                                 .cornerRadius(10)
+                            
+                            GlassCard{
+                                VStack {
+                                    Toggle("Dark Mode", isOn: $isDarkMode)
+                                        }
+                                        .preferredColorScheme(isDarkMode ? .dark : .light)
+                            }
                             
                             VStack{
                                 Text("Account").foregroundColor(.appSecondary).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal).padding(.top)
@@ -169,6 +182,10 @@ struct ProfileView:View {
                                     session.logout(email: session.user?.email ?? "")
                                     userViewModel.goal = nil
                                     userViewModel.currentUser.goalId = nil
+                                    userViewModel.onLogout()
+                                    goalViewModel.onLogout()
+                                    mealViewModel.onLogout()
+                                    session.onLogout()
                                 }.frame(maxWidth: .infinity)
                             }
                             

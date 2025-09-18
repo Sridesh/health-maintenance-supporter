@@ -21,7 +21,7 @@ struct GlassCard<Content: View>: View {
             BlurView(style: .systemUltraThinMaterial)
                 .background(
                     LinearGradient(
-                        gradient: Gradient(colors: [Color.white.opacity(0.5), Color.white.opacity(0.4)]),
+                        gradient: Gradient(colors: [Color.glassBackground.opacity(0.5), Color.glassBackground.opacity(0.4)]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )

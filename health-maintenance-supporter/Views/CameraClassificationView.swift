@@ -53,7 +53,7 @@ struct CameraClassificationView: View {
             }
             .padding()
             .background(Color.appSecondary)
-            .foregroundColor(.white)
+            .foregroundColor(.appWhiteText)
             .cornerRadius(10)
             .disabled(isLoading)
             
@@ -74,6 +74,7 @@ struct CameraClassificationView: View {
                     }
                     .padding()
                     .background(Color.appPrimary)
+                    .foregroundColor(Color.appWhiteText)
                     .cornerRadius(10)
                     .sheet(isPresented: $isSheetOpen) {
                         FoodItemDetails(portionSize: 100.0)

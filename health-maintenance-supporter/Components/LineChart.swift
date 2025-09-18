@@ -22,7 +22,7 @@ struct LineChartView: View {
                     )
                     .interpolationMethod(.catmullRom) // smooth curve
                     .foregroundStyle(LinearGradient(
-                        colors: [Color.blue, Color.purple],
+                        colors: [Color.appSecondary, Color.appPrimary],
                         startPoint: .leading,
                         endPoint: .trailing
                     ))
@@ -48,19 +48,4 @@ struct LineChartView: View {
     }
 }
 
-// MARK: - Preview
-struct LineChartView_Previews: PreviewProvider {
-    static var previews: some View {
-        let sampleData: [DailyValue] = [
-            DailyValue(date: "09-10", value: 5000),
-            DailyValue(date: "09-11", value: 7000),
-            DailyValue(date: "09-12", value: 6500),
-            DailyValue(date: "09-13", value: 8000),
-            DailyValue(date: "09-14", value: 4000),
-            DailyValue(date: "09-15", value: 9000),
-            DailyValue(date: "09-16", value: 7500),
-        ]
-        
-        LineChartView(data: sampleData, title: "Steps Last Week")
-    }
-}
+

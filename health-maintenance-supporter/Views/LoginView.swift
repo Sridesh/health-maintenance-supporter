@@ -20,7 +20,7 @@ struct SignInView: View {
         NavigationView{
             ZStack {
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.appPrimary.opacity(0.5), Color.appSecondary.opacity(0.5)]),
+                    gradient: Gradient(colors: [Color.appBackgound, Color.appSecondary.opacity(0.5)]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -85,7 +85,6 @@ struct SignInView: View {
                         
                         Button("Forgot Password?") {}
                             .font(.footnote)
-                            .foregroundColor(Color.appText)
                             .padding(.top, 4)
                         
                         Divider()
