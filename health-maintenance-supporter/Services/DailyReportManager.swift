@@ -11,7 +11,7 @@ import Firebase
 
 @MainActor
 struct DailyReportManager {
-    static func getTodayReport(context: ModelContext) -> DailyReport {
+    static func getTodayReport(context: ModelContext) -> DailyReport { // get daily report for today
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -22,10 +22,10 @@ struct DailyReportManager {
         )
         
         if let existing = try? context.fetch(fetchDescriptor).first {
-            print("Found a daily report for today")
+            print("SUCCESS: Found a daily report for today")
             return existing
         } else {
-            print("Did not found a daily report for today")
+            print("INFO: Did not found a daily report for today")
             let newReport = DailyReport(
                 date: Date(),
                 calorieTotal: 0,
@@ -37,13 +37,14 @@ struct DailyReportManager {
             )
             context.insert(newReport)
             
-            do { try context.save() } catch { print("Failed to save DailyReport: \(error)") }
+            do { try context.save() } catch {
+                print("ERR: Failed to save DailyReport: \(error)") }
             
             return newReport
         }
     }
 
-    static func hasReportsBeforeToday(context: ModelContext) -> Bool {
+    static func hasReportsBeforeToday(context: ModelContext) -> Bool {      //check if there are any pasts reports which haven'r been backed up
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let todayString = formatter.string(from: Date())
@@ -56,13 +57,13 @@ struct DailyReportManager {
             let results = try context.fetch(descriptor)
             return !results.isEmpty
         } catch {
-            print("Failed to fetch DailyReports: \(error)")
+            print("ERR: Failed to fetch DailyReports: \(error)")
             return false
         }
     }
     
     
-    static func backupOldReports(context: ModelContext, email:String,  completion: @escaping (Bool) -> Void) {
+    static func backupOldReports(context: ModelContext, email:String,  completion: @escaping (Bool) -> Void) {      // back up found old reports
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
             let todayString = formatter.string(from: Date())
@@ -88,7 +89,7 @@ struct DailyReportManager {
             }
         }
         
-        private static func backupReportsSequentially(
+        private static func backupReportsSequentially(      //back up found old reports and delete them from core data
             _ reports: [DailyReport],
             context: ModelContext,
             db: Firestore,
@@ -97,7 +98,7 @@ struct DailyReportManager {
             completion: @escaping (Bool) -> Void
         ) {
             guard index < reports.count else {
-                completion(true) // All backed up
+                completion(true)
                 return
             }
             
@@ -122,7 +123,7 @@ struct DailyReportManager {
             print("Uploading report: \(reportData)")
             
             db.collection("dailyReports")
-                .document("\(report.dateString)_\(email)") // unique key by date
+                .document("\(report.dateString)_\(email)") //unique key by date
                 .setData(reportData) { error in
                     if let error = error {
                         print("Failed to backup report \(report.dateString): \(error)")
@@ -130,7 +131,7 @@ struct DailyReportManager {
                     } else {
                         print("Backed up report \(report.dateString)")
                         
-                        // Delete from Core Data  if backup succeeded
+                        //delete from core data  if backup succeed
                         context.delete(report)
                         do {
                             try context.save()
@@ -143,7 +144,7 @@ struct DailyReportManager {
                 }
         }
     
-    static func fetchDailyReportsLastWeek(completion: @escaping ([DailyReport]) -> Void) {
+    static func fetchDailyReportsLastWeek(email: String, completion: @escaping ([DailyReport]) -> Void) {       // fetch historical backedup data from fire base for last week
         let db = Firestore.firestore()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -160,12 +161,13 @@ struct DailyReportManager {
         let weekAgoString = formatter.string(from: weekAgo)
         
         db.collection("dailyReports")
+            .whereField("email", isEqualTo: email)      // verification for email to avoid other's reports
             .whereField("dateString", isGreaterThanOrEqualTo: weekAgoString)
             .whereField("dateString", isLessThanOrEqualTo: todayString)
             .order(by: "dateString", descending: false)
             .getDocuments { snapshot, error in
                 if let error = error {
-                    print("❌ Error fetching reports: \(error.localizedDescription)")
+                    print("Error fetching reports: \(error.localizedDescription)")
                     completion([])
                     return
                 }
@@ -209,126 +211,4 @@ struct DailyReportManager {
                 completion(reports)
             }
     }
-    
-//    static func fetchDailyReportsLastWeek(email: String, completion: @escaping ([DailyReport]) -> Void) {
-//        let db = Firestore.firestore()
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy-MM-dd"
-//        formatter.timeZone = TimeZone(secondsFromGMT: 0) // Use UTC for consistency
-//        
-//        let today = Date()
-//        let calendar = Calendar.current
-//        guard let weekAgo = calendar.date(byAdding: .day, value: -6, to: today) else {
-//            print("❌ Failed to calculate week ago date")
-//            completion([])
-//            return
-//        }
-//        
-//        let todayString = formatter.string(from: today)
-//        let weekAgoString = formatter.string(from: weekAgo)
-//        
-//        // Generate all possible document IDs for the date range
-//        var documentIds: [String] = []
-//        var currentDate = weekAgo
-//        
-//        while currentDate <= today {
-//            let dateString = formatter.string(from: currentDate)
-//            let docId = "\(email)_\(dateString)"
-//            documentIds.append(docId)
-//            
-//            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: currentDate) else {
-//                break
-//            }
-//            currentDate = nextDay
-//        }
-//        
-//        print("🔍 Looking for documents: \(documentIds)")
-//        
-//        // Fetch documents by their compound IDs
-//        let dispatchGroup = DispatchGroup()
-//        var reports: [DailyReport] = []
-//        var fetchErrors: [Error] = []
-//        
-//        for docId in documentIds {
-//            dispatchGroup.enter()
-//            
-//            db.collection("dailyReports")
-//                .document(docId)
-//                .getDocument { snapshot, error in
-//                    defer { dispatchGroup.leave() }
-//                    
-//                    if let error = error {
-//                        print("❌ Error fetching document \(docId): \(error.localizedDescription)")
-//                        fetchErrors.append(error)
-//                        return
-//                    }
-//                    
-//                    guard let document = snapshot,
-//                          document.exists,
-//                          let data = document.data() else {
-//                        print("📄 No document found for \(docId)")
-//                        return
-//                    }
-//                    
-//                    // Parse the document data
-//                    let dateString = data["dateString"] as? String ?? ""
-//                    let calorieTotal = data["calorieTotal"] as? Int ?? 0
-//                    let stepsTotal = data["stepsTotal"] as? Int ?? 0
-//                    let waterTotal = data["waterTotal"] as? Int ?? 0
-//                    let distanceTotal = data["distanceTotal"] as? Int ?? 0
-//                    let taskCompletion = data["taskCompletion"] as? Double ?? 0.0
-//                    
-//                    // Parse macros - handle both Int and Double values
-//                    let macrosDict = data["macrosTotal"] as? [String: Any] ?? [:]
-//                    let carbs: Double
-//                    let protein: Double
-//                    let fats: Double
-//                    
-//                    if let carbsInt = macrosDict["carbs"] as? Int {
-//                        carbs = Double(carbsInt)
-//                    } else {
-//                        carbs = macrosDict["carbs"] as? Double ?? 0.0
-//                    }
-//                    
-//                    if let proteinInt = macrosDict["protein"] as? Int {
-//                        protein = Double(proteinInt)
-//                    } else {
-//                        protein = macrosDict["protein"] as? Double ?? 0.0
-//                    }
-//                    
-//                    if let fatsInt = macrosDict["fats"] as? Int {
-//                        fats = Double(fatsInt)
-//                    } else {
-//                        fats = macrosDict["fats"] as? Double ?? 0.0
-//                    }
-//                    
-//                    let macros = Macro(carbs: carbs, protein: protein, fats: fats)
-//                    
-//                    let report = DailyReport(
-//                        date: formatter.date(from: dateString) ?? Date(),
-//                        calorieTotal: calorieTotal,
-//                        stepsTotal: stepsTotal,
-//                        waterTotal: waterTotal,
-//                        distanceTotal: distanceTotal,
-//                        macrosTotal: macros,
-//                        taskCompletion: taskCompletion
-//                    )
-//                    
-//                    reports.append(report)
-//                    print("✅ Successfully parsed report for \(dateString)")
-//                }
-//        }
-//        
-//        dispatchGroup.notify(queue: .main) {
-//            // Sort reports by date (oldest first)
-//            reports.sort { $0.date < $1.date }
-//            
-//            print("📊 Fetched \(reports.count) reports for last week")
-//            if !fetchErrors.isEmpty {
-//                print("⚠️ Encountered \(fetchErrors.count) errors during fetch")
-//            }
-//            
-//            completion(reports)
-//        }
-//    }
 }

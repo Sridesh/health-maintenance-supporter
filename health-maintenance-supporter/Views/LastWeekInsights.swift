@@ -8,26 +8,28 @@
 import SwiftUI
 
 struct LastWeekInsights: View {
-    @State private var insights: [DailyReport] = []  
+    @EnvironmentObject var userViewModel:UserViewModel
     
-    // MARK: - Fetched Chart Data
+    @State private var insights: [DailyReport] = []
+    
+    // MARK: - Fetched Historical Chart Data
     private var waterData: [DailyValue] {
         insights.map { DailyValue(date: $0.dateString.monthDayOnly(), value: $0.waterTotal) }
     }
     
-    private var calorieData: [DailyValue] {
+    private var calorieDataWeek: [DailyValue] {
         insights.map { DailyValue(date: $0.dateString.monthDayOnly(), value: $0.calorieTotal) }
     }
     
-    private var stepsData: [DailyValue] {
+    private var stepsDataWeek: [DailyValue] {
         insights.map { DailyValue(date: $0.dateString.monthDayOnly(), value: $0.stepsTotal) }
     }
     
-    private var distanceData: [DailyValue] {
+    private var distanceDataWeek: [DailyValue] {
         insights.map { DailyValue(date: $0.dateString.monthDayOnly(), value: $0.distanceTotal) }
     }
     
-    private var weeklyMacroData: [MacroValue] {
+    private var macroDataWeek: [MacroValue] {
         let totalProtein = insights.reduce(0) { $0 + $1.macrosTotal.protein }
         let totalCarbs   = insights.reduce(0) { $0 + $1.macrosTotal.carbs }
         let totalFat     = insights.reduce(0) { $0 + $1.macrosTotal.fats }
@@ -50,35 +52,35 @@ struct LastWeekInsights: View {
                         .foregroundColor(.gray)
                         .padding()
                 } else {
-                    //Water
+                    //water
                     GlassCard{
                         BarChartView(data: waterData, title: "Water Intake (L)")
                     }
                     
-                    //Calories
+                    //calories
                     GlassCard{
-                        BarChartView(data: calorieData, title: "Calories Burned")
+                        BarChartView(data: calorieDataWeek, title: "Calories Burned")
                     }
                     
-                    //Steps
+                    //steps
                     GlassCard{
-                        LineChartView(data: stepsData, title: "Steps")
+                        LineChartView(data: stepsDataWeek, title: "Steps")
                     }
                     
-                    //Distance
+                    //distance
                     GlassCard{
-                        LineChartView(data: distanceData, title: "Distance (km)")
+                        LineChartView(data: distanceDataWeek, title: "Distance (km)")
                     }
                     
-                    //Macros
+                    //macros
                     GlassCard{
-                        PieChartView(data: weeklyMacroData, title: "Macros intake Last Week")
+                        PieChartView(data: macroDataWeek, title: "Macros intake Last Week")
                     }
                 }
             }
             .padding()
             .onAppear {
-            DailyReportManager.fetchDailyReportsLastWeek { reports in
+                DailyReportManager.fetchDailyReportsLastWeek(email: userViewModel.currentUser.email){ reports in
                 insights = reports
             }
         }

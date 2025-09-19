@@ -47,16 +47,6 @@ struct ProfileView:View {
                             }
                             .padding(.horizontal)
                             
-                            //                Text(session.user?.email ?? "No email")
-                            //                    .frame(maxWidth: .infinity, alignment: .center)
-                            //                    .bold()
-                            //
-                            //
-                            //                Text(session.user?.password ?? "No phone number")
-                            //                    .foregroundColor(.secondary)
-                            //                Text(session.user?.gender ?? "No phone number")
-                            //                    .foregroundColor(.secondary)
-                            
                             
                             HStack{
                                 Spacer()

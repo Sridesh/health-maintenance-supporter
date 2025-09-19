@@ -36,7 +36,9 @@ struct EditUserView: View {
                                 }
                                 .pickerStyle(.segmented)
                             }
+
                             Divider().padding(.vertical)
+                            
                             HStack{
                                 Text("Age")
                                 Spacer()
@@ -47,7 +49,9 @@ struct EditUserView: View {
                                     .background(Color.white)
                                     .cornerRadius(10)
                             }.frame(maxWidth: .infinity)
+                            
                             Divider().padding(.vertical)
+                            
                             HStack{
                                 Text("Wight")
                                 Spacer()
@@ -58,7 +62,9 @@ struct EditUserView: View {
                                     .background(Color.white)
                                     .cornerRadius(10)
                             }.frame(maxWidth: .infinity)
+                            
                             Divider().padding(.vertical)
+                            
                             HStack{
                                 Text("Weight")
                                 Spacer()
@@ -90,8 +96,7 @@ struct EditUserView: View {
                 
                 .frame(maxHeight: .infinity, alignment: .top)
                     .navigationTitle("Edit Profile")
-                    .onAppear {
-                        // preload existing user data
+                    .onAppear {                                         //load existing user data
                         let user = userViewModel.currentUser
                         self.age = "\(user.age)"
                         self.weight = "\(user.weight)"
@@ -107,6 +112,8 @@ struct EditUserView: View {
         }
     }
     
+    
+    //MARK: - functions
     private func saveUser() {
         guard let ageInt = Int(age),
               let weightDouble = Double(weight),

@@ -23,6 +23,7 @@ struct SignupView: View {
     @State private var agreed = false
     
     @EnvironmentObject var authViewModel : AuthenticationViewModel
+//    @EnvironmentObject var authViewModel: AuthenticationViewModelMock
 
     var body: some View {
         NavigationView {
@@ -62,11 +63,13 @@ struct SignupView: View {
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
                             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
                             .foregroundColor(.white)
+                            .accessibilityLabel("emailTF")
                         
                         // Password Field
                         HStack {
                             if isSecure {
                                 SecureField("Password", text: $password)
+                                    .accessibilityLabel("passwordTF")
                             } else {
                                 TextField("Password", text: $password)
                             }
@@ -88,6 +91,7 @@ struct SignupView: View {
                                     .foregroundColor(Color.appSecondary)
                             }
                             .toggleStyle(CheckboxToggleStyle())
+                            .accessibilityLabel("toggleBTN")
                             
                         }
                         .padding()
@@ -109,6 +113,7 @@ struct SignupView: View {
                         .alert(isPresented: $showAlert) {
                             Alert(title: Text("Login"), message: Text("Login tapped!"), dismissButton: .default(Text("OK")))
                         }
+                        .accessibilityLabel("signupBTN")
                         
                         
                         
@@ -160,6 +165,3 @@ struct CheckboxToggleStyle: ToggleStyle {
 
 
 
-//#Preview {
-//    SignupView()
-//}

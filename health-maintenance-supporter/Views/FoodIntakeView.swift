@@ -90,14 +90,4 @@ struct FoodIntakeView: View {
 }
 
 
-#Preview {
-    let container = try! ModelContainer(for: MealList.self, Meal.self, Food.self)
-    let context = ModelContext(container)
-    let mockUserVM = UserViewModel()
-    let mealVM = MealsViewModel(context: context)
-    
-    AdditionsView()
-        .environmentObject(mockUserVM)
-        .environmentObject(mealVM)
-        .environment(\.modelContext, context)
-}
+

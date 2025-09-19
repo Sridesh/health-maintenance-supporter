@@ -33,26 +33,25 @@ final class GoalsViewModel: ObservableObject {
     
     // MARK: - Setup today's water intake
     private func setupWaterIntake() {
-        print("Setting up today’s water intake")
+        print("INFO: Setting up today’s water intake")
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let todayString = formatter.string(from: today)
+
         
-        print("Looking for water intake with dateString: \(todayString)")
-        
-        // Fetch existing Water record for today
+        //fetch existing water record for today
         let fetchDescriptor = FetchDescriptor<Water>(
             predicate: #Predicate<Water> { $0.dateString == todayString }
         )
         
         if let existing = try? context.fetch(fetchDescriptor).first {
-            print("Found existing water record for today")
+            print("SUCCESS: Found existing water record for today")
             self.waterIntake = existing
         } else {
-            print("Creating new water record for today")
+            print("INFO: Creating new water record for today")
             
             let newWater = Water(date: today, intake: 0)
             context.insert(newWater)
@@ -60,9 +59,9 @@ final class GoalsViewModel: ObservableObject {
             do {
                 try context.save()
                 self.waterIntake = newWater
-                print("Successfully created and saved new water record")
+                print("SUCCESS: Successfully created new water record")
             } catch {
-                print("Failed to save Water: \(error)")
+                print("ERR: Failed to save Water: \(error)")
             }
         }
     }
@@ -74,7 +73,7 @@ final class GoalsViewModel: ObservableObject {
         
         dailyReport.waterTotal += Int(amount)
 
-        if waterIntake?.intake ?? 0 > userViewModel.goal?.dailyTargets.water ?? 0 {
+        if waterIntake?.intake ?? 0 > userViewModel.goal?.dailyTargets.water ?? 0 {     // conditional stopping for push notification
             notificationService.stopWaterReminder()
         } 
         save()
@@ -88,7 +87,7 @@ final class GoalsViewModel: ObservableObject {
 
         dailyReport.waterTotal = max(dailyReport.waterTotal - Int(actualRemoved), 0)
         
-        if waterIntake?.intake ?? 0 < userViewModel.goal?.dailyTargets.water ?? 0 {
+        if waterIntake?.intake ?? 0 < userViewModel.goal?.dailyTargets.water ?? 0 {     //conditional starting of push notification
             notificationService.scheduleWaterReminder()
         }
         save()
@@ -99,13 +98,13 @@ final class GoalsViewModel: ObservableObject {
         do {
             try context.save()
         } catch {
-            print("Failed to save Water intake: \(error)")
+            print("ERR: Failed to save Water intake: \(error)")
         }
     }
     
     // MARK: - Add a daily goal
     func addCompletedGoal(_ goal: String) {
-            if !dailyGoals.contains(goal) { // avoid duplicates
+            if !dailyGoals.contains(goal) {
                 dailyGoals.append(goal)
             }
         
@@ -118,6 +117,7 @@ final class GoalsViewModel: ObservableObject {
         
         dailyReport.taskCompletion  = Double(dailyGoals.count /  (userViewModel.goal?.specialTargets.count ?? 1))
         }
+    
     // MARK: - Reset on logout
     func onLogout() {
             if let water = waterIntake {

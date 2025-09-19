@@ -104,8 +104,6 @@ private func testModelLoading() {
         let config = MLModelConfiguration()
 //        config.computeUnits = .cpuOnly
 
-        
-        // Test 1: Check if model file exists in bundle
         if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodel") {
             
             let coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
@@ -119,7 +117,6 @@ private func testModelLoading() {
             
         } else {
             print("No model file found in bundle")
-            // List all files containing "FoodClassifier" for debugging
             if let bundlePath = Bundle.main.resourcePath {
                 let allFiles = try? FileManager.default.contentsOfDirectory(atPath: bundlePath)
                 let modelFiles = allFiles?.filter { $0.contains("FoodClassifier") } ?? []
@@ -178,29 +175,22 @@ private func classifyImage(_ image: UIImage) async {
     }
     
     do {
-        // Create model configuration for CPU-only computation
         let config = MLModelConfiguration()
-        config.computeUnits = .cpuOnly  // Force CPU-only for simulator compatibility
+        config.computeUnits = .cpuOnly
         
-        // load the .mlmodel file directly
         let coreMLModel: MLModel
         if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodelc") {
-            //use compiled model with configuration
             coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
-            print("Loaded compiled .mlmodelc with CPU-only config")
         } else if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodel") {
-            // Use raw .mlmodel as fallback
             coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
-            print("Loaded raw .mlmodel with CPU-only config")
         } else {
             coreMLModel = try FoodClassifier(configuration: config).model
-            print("Loaded generated class model with CPU-only config")
         }
         
         
-        // Vision model
+        //Vision
         let model = try VNCoreMLModel(for: coreMLModel)
-        print("VNCoreMLModel created successfully")
+        print("SUCCESS: VNCoreMLModel created successfully")
         
         let request = VNCoreMLRequest(model: model) { request, error in
             if let error = error {
@@ -216,7 +206,7 @@ private func classifyImage(_ image: UIImage) async {
                     print("  \(index + 1). \(result.identifier): \(Int(result.confidence * 100))%")
                 }
                 
-                // get the top result
+      
                 if let topResult = results.first {
                     Task { @MainActor in
                         if topResult.confidence > 0.01 { // Lower threshold for debugging
@@ -237,10 +227,8 @@ private func classifyImage(_ image: UIImage) async {
             }
         }
         
-        // image crop and scale option to match training
         request.imageCropAndScaleOption = .centerCrop
         
-        // image orientation
         let orientation = CGImagePropertyOrientation(image.imageOrientation)
         let handler = VNImageRequestHandler(ciImage: ciImage, orientation: orientation)
         try handler.perform([request])
@@ -266,4 +254,6 @@ private func classifyImage(_ image: UIImage) async {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
+
+
 

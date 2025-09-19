@@ -33,7 +33,7 @@ struct AdditionalDetails: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 20) {
-                    // App Logo
+                    //---------------app Logo--------------------//
                     Image("fitzy")
                         .resizable()
                         .scaledToFit()
@@ -46,7 +46,7 @@ struct AdditionalDetails: View {
                             .foregroundColor(Color.appPrimary)
                             .padding(.bottom, 10)
 
-                        // Step Views
+                       
                         stepView()
                     }
                     .padding(30)
@@ -61,7 +61,7 @@ struct AdditionalDetails: View {
                 }
                 .padding(.horizontal, 24)
             }
-            .alert("Please enter a valid value", isPresented: $showAlert) {
+            .alert("Please enter valid value", isPresented: $showAlert) {
                 Button("OK", role: .cancel) {}
             }
         }
@@ -71,7 +71,7 @@ struct AdditionalDetails: View {
     private func stepView() -> some View {
         switch step {
             
-        case 0:
+        case 0:     //name collection
             VStack(spacing: 20) {
                 Text("What name should we call you?")
                     .font(.headline)
@@ -87,7 +87,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
         
-        case 1:
+        case 1:     //gender
             VStack(spacing: 20) {
                 Text("Nice to know you \(name).")
                     .font(.headline)
@@ -108,7 +108,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 2:
+        case 2:     //age collection
             VStack(spacing: 20) {
                 Text("How old are you \(name)?")
                     .font(.headline)
@@ -124,7 +124,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 3:
+        case 3:     //weight collection
             VStack(spacing: 20) {
                 Text("Enter your weight (kg)")
                     .font(.headline)
@@ -140,7 +140,7 @@ struct AdditionalDetails: View {
                 nextButton()
             }
 
-        case 4:
+        case 4:     //height collection
             VStack(spacing: 20) {
                 Text("Enter your height (cm)")
                     .font(.headline)
@@ -158,7 +158,7 @@ struct AdditionalDetails: View {
 
             }
             
-        case 5:
+        case 5:     //detail confirmation
             VStack{
                 
                 if userModel.currentUser.goalId != nil {

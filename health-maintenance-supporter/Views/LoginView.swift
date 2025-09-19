@@ -1,4 +1,4 @@
-//
+///
 //  LoginView.swift
 //  health-maintenance-supporter
 //
@@ -15,6 +15,7 @@ struct SignInView: View {
     @State private var showAlert = false
     
     @EnvironmentObject var authViewModel : AuthenticationViewModel
+//    @EnvironmentObject var authViewModel : AuthenticationViewModelMock //use this while testing
 
     var body: some View {
         NavigationView{
@@ -28,7 +29,7 @@ struct SignInView: View {
                 
                 VStack(spacing: 10) {
                     
-                    // App Logo
+                    // ----------------------app Logo--------------------------
                     Image( "fitzy")
                         .resizable()
                         .scaledToFit()
@@ -47,10 +48,12 @@ struct SignInView: View {
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
                             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.2)))
                             .foregroundColor(.white)
+                            .accessibilityIdentifier("emailTF")
                    
                         HStack {
                             if isSecure {
                                 SecureField("Password", text: $password)
+                                    .accessibilityIdentifier("passwordTF")
                             } else {
                                 TextField("Password", text: $password)
                             }
@@ -79,6 +82,7 @@ struct SignInView: View {
                                 .cornerRadius(14)
                                 .shadow(radius: 8, y: 4)
                         }
+                        .accessibilityIdentifier("signInBTN")
                         .alert(isPresented: $authViewModel.loginError) {
                             Alert(title: Text("Login"), message: Text("Invalid email or password"), dismissButton: .default(Text("Try Again")))
                         }

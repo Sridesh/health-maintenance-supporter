@@ -110,25 +110,23 @@ struct CameraClassificationView: View {
         do {
             let config = MLModelConfiguration()
             
-            // Test 1: Check if model file exists in bundle
             if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodel") {
                 
                 let coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
 
                 let visionModel = try VNCoreMLModel(for: coreMLModel)
-                print("vision model created successfully")
+                print("DEBUG: vision model created successfully")
                 
             } else if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodelc") {
                 let coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
-                print("Compiled model loaded successfully")
+                print("SUCCESS: Compiled model loaded successfully")
                 
             } else {
-                print("No model file found in bundle")
-                // List all files containing "FoodClassifier" for debugging
+                print("ERR: No model file found in bundle")
+                
                 if let bundlePath = Bundle.main.resourcePath {
                     let allFiles = try? FileManager.default.contentsOfDirectory(atPath: bundlePath)
                     let modelFiles = allFiles?.filter { $0.contains("FoodClassifier") } ?? []
-                    print("📁 Files containing 'FoodClassifier': \(modelFiles)")
                 }
 
                 let model = try FoodClassifier(configuration: config)
@@ -169,27 +167,23 @@ struct CameraClassificationView: View {
         }
         
         do {
-            // Create model configuration for CPU-only computation
             let config = MLModelConfiguration()
-            config.computeUnits = .cpuOnly  // Force CPU-only for simulator compatibility
+//            config.computeUnits = .cpuOnly
             
-            // load the .mlmodel file directly
+            // load mlmodel
             let coreMLModel: MLModel
             if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodelc") {
-                //use compiled model with configuration
+
                 coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
-                print("Loaded compiled .mlmodelc with CPU-only config")
+                print("SUCCESS: Loaded compiled")
             } else if let modelURL = Bundle.main.url(forResource: "FoodClassifier", withExtension: "mlmodel") {
-                // Use raw .mlmodel as fallback
                 coreMLModel = try MLModel(contentsOf: modelURL, configuration: config)
-                print("Loaded raw .mlmodel with CPU-only config")
             } else {
                 coreMLModel = try FoodClassifier(configuration: config).model
-                print("Loaded generated class model with CPU-only config")
             }
             
             
-            // Vision model
+            //Vision
             let model = try VNCoreMLModel(for: coreMLModel)
             print("VNCoreMLModel created successfully")
             
@@ -249,9 +243,9 @@ struct CameraClassificationView: View {
     }
     
     // MARK: - Image Preprocessing
-    private func preprocessImage(_ image: UIImage) -> UIImage? {
-        // Resize to expected input size (adjust based on your model's requirements)
-        let targetSize = CGSize(width: 299, height: 299) // Common size for food classification models
+    private func preprocessImage(_ image: UIImage) -> UIImage? {    //resize to expected input size
+        
+        let targetSize = CGSize(width: 299, height: 299) // required size is 299 by model
         
         UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
         defer { UIGraphicsEndImageContext() }

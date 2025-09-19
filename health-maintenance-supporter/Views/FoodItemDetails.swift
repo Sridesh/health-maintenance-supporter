@@ -140,7 +140,3 @@ struct TotalCalories : View {
         .padding(.bottom)
     }
 }
-
-#Preview {
-    FoodItemDetails(portionSize: 100)
-}

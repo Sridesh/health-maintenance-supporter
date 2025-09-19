@@ -49,8 +49,8 @@ struct FoodSearch: View {
                 }
             }
             
-            // Show results only if there is text
-            if !searchText.isEmpty {
+            
+            if !searchText.isEmpty { //show results only if there is text
                 VStack(spacing: 0) {
                     ForEach(filteredFoods, id: \.self) { food in
                         NavigationLink(destination: FoodItemDetails(portionSize: 200.00)
@@ -83,27 +83,9 @@ struct FoodSearch: View {
     }
 }
 
+//
+//#Preview {
+//    FoodSearch()
+//}
 
-#Preview {
-    FoodSearch()
-}
 
-// Helper for previewing with @Binding
-struct StatefulPreviewWrapper<Value>: View {
-    @State var value: Value
-    var content: (Binding<Value>) -> AnyView
-
-    init(_ value: Value, content: @escaping (Binding<Value>) -> AnyView) {
-        _value = State(wrappedValue: value)
-        self.content = content
-    }
-
-    init(_ value: Value, content: @escaping (Binding<Value>) -> some View) {
-        _value = State(wrappedValue: value)
-        self.content = { binding in AnyView(content(binding)) }
-    }
-
-    var body: some View {
-        content($value)
-    }
-}

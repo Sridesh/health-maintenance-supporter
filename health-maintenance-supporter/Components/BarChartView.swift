@@ -8,14 +8,14 @@
 import SwiftUI
 import Charts
 
-// MARK: - Data Model
+// MARK: - Data
 struct DailyValue: Identifiable {
     var id = UUID()
-    let date: String   // e.g., "2025-09-16"
+    let date: String 
     let value: Int
 }
 
-// MARK: - Reusable Bar Chart
+// MARK: - Chart
 struct BarChartView: View {
     let data: [DailyValue]
     let title: String

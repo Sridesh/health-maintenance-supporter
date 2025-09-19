@@ -16,8 +16,8 @@ final class NotificatioNService {
         content.subtitle = "Keep hydrated! Your goal isn’t reached yet."
         content.sound = UNNotificationSound.default
         
-        // Trigger after 5 seconds
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60*3, repeats: true)
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60*30, repeats: true)     //notification repeating every 30 mins
         
         let request = UNNotificationRequest(identifier: "waterReminder",
                                             content: content,
@@ -27,13 +27,13 @@ final class NotificatioNService {
             if let error = error {
                 print("Error: \(error.localizedDescription)")
             } else {
-                print("Notification scheduled!")
+                print("SUCCESS: Notification scheduled!")
             }
         }
     }
     
     func stopWaterReminder() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["waterReminder"])
-        print("Water reminder stopped")
+        print("DEBUG: Water reminder stopped")
     }
 }

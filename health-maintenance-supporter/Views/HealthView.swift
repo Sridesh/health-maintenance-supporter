@@ -218,10 +218,3 @@ struct CalCount: View {
         }
     }
 }
-
-#Preview {
-    let mockGoalVM = UserViewModel()
-    
-    AdditionsView()
-        .environmentObject(mockGoalVM)
-}

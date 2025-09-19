@@ -35,13 +35,13 @@ class HealthStore: ObservableObject {
                 if success {
                     self.fetchAllData()
                 } else {
-                    print("HealthKit authorization failed: \(String(describing: error))")
+                    print("ERR: HealthKit authorization failed: \(String(describing: error))")
                 }
             }
         }
     }
     
-    /// Fetch all activity data for today
+    //fetch all activity data for today
     func fetchAllData() {
         fetchSteps()
         fetchDistance()
@@ -85,7 +85,7 @@ class HealthStore: ObservableObject {
         }
     }
     
-    /// Helper to fetch today’s total sum for a given type
+    //fetch today sum for a given type
     private func fetchSum(for quantityType: HKQuantityType,
                           unit: HKUnit,
                           completion: @escaping (Double) -> Void) {

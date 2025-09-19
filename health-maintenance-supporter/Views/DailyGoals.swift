@@ -11,7 +11,6 @@ struct DailyGoals: View {
     @EnvironmentObject var userViewModel: UserViewModel
     @EnvironmentObject var goalViewModel: GoalsViewModel
 
-    // Computed property
     var goals: [String]? {
         guard let specialTargets = userViewModel.goal?.specialTargets else { return nil }
         return specialTargets.map { key, value in

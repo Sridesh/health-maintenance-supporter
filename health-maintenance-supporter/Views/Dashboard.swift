@@ -45,7 +45,7 @@ struct DashboardView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 8) {
                     
-                    // Greeting & Date
+                    //MARK: -  Greeting & Date
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome,")
@@ -66,6 +66,8 @@ struct DashboardView: View {
                     }
                     .padding(.horizontal, 4)
                     
+                    
+                    //MARK: - semmary data
                     DailyRings(animateRings: animateRings)
                         .environmentObject(goalViewModel)
                         .environmentObject(userViewModel)
@@ -73,7 +75,7 @@ struct DashboardView: View {
                         .environmentObject(activityViewModel)
                 
 
-                     // Macros Section
+                     //MARK: -  Macros Section
                     GlassCard {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Macros Overview")
@@ -87,7 +89,7 @@ struct DashboardView: View {
                         }.frame(maxWidth: .infinity)
                     }
                     
-                    // Meals Section
+                    //MARK: -  Meals Section
                     GlassCard {
                         HStack {
                             Text("Today's Meals")
@@ -135,161 +137,3 @@ struct DashboardView: View {
     }
 }
 
-struct DailyRings: View {
-    @EnvironmentObject var mealViewModel: MealsViewModel
-    @EnvironmentObject var userViewModel: UserViewModel
-    @EnvironmentObject var goalViewModel: GoalsViewModel
-    @EnvironmentObject var activityViewModel: ActivityViewModel
-    
-    @State var animateRings = false   // <-- changed from 'let' to '@State'
-    
-    @StateObject private var healthStore = HealthStore()
-    
-    private var burn: Double {
-        (healthStore.basalCalories + healthStore.activeCalories)
-    }
-    
-    var body: some View {
-        // Daily Summary Rings
-        GlassCard {
-            Text(userViewModel.goal?.goal ?? "")
-                .padding(.bottom)
-                .font(.title3)
-                .bold()
-           
-            
-            HStack(spacing: 28) {
-                RingStat(
-                    title: "Calories",
-                    value: Double(max(Int(Double(mealViewModel.totalCalories()) - burn),0)),
-                    goal: Double(userViewModel.goal?.dailyTargets.calories ?? 0),
-                    color: .orange,
-                    icon: "flame.fill",
-                    progress: animateRings ? CGFloat(Double(mealViewModel.totalCalories())  /  (Double(userViewModel.goal?.dailyTargets.calories ?? 1))) : 0
-                )
-                .accessibilityLabel("Calorie intake")
-                RingStat(
-                    title: "Steps",
-                    value: Double(healthStore.steps ?? 0),
-                    goal: Double(userViewModel.goal?.dailyTargets.steps ?? 0),
-                    color: .green,
-                    icon: "figure.walk",
-                    progress: animateRings ? CGFloat(Double(activityViewModel.todayActivity?.steps ?? 0)  /  (Double(userViewModel.goal?.dailyTargets.steps ?? 1))) : 0
-                )
-                .accessibilityLabel("Steps today")
-                RingStat(
-                    title: "Water",
-                    value: goalViewModel.waterIntake?.intake ?? 0,
-                    goal: Double(userViewModel.goal?.dailyTargets.water ?? 0),
-                    color: .blue,
-                    icon: "drop.fill",
-                    progress: animateRings ? CGFloat((goalViewModel.waterIntake?.intake ?? 0) / (Double(userViewModel.goal?.dailyTargets.water ?? 1))) : 0
-                )
-                .accessibilityLabel("Water intake")
-            }
-            .onAppear { animateRings = true
-                
-            }
-        }
-        .padding(.top)
-    }
-}
-
-
-// MARK: - RingStat
-struct RingStat: View {
-    let title: String
-    let value: Double
-    let goal: Double
-    let color: Color
-    let icon: String
-    let progress: CGFloat
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(Color.appBlue.opacity(0.12), lineWidth: 10)
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(
-                        LinearGradient(colors: [Color.appSecondary, Color.appPrimary], startPoint: .top, endPoint: .bottomTrailing),
-                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeOut(duration: 1.2), value: progress)
-                Image(systemName: icon)
-                    .foregroundColor(Color.appPrimary)
-                    .font(.title2)
-            }
-            .frame(width: 70, height: 70)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(Color.appSecondary)
-            Text(title == "Water" ? String(format: "%.1fL", value) : "\(Int(value))")
-                .font(.headline)
-                .bold()
-            Text("\(Int(progress * 100))%")
-                .font(.caption2)
-                .foregroundColor(Color.appSecondary)
-        }
-        .frame(width: 90)
-    }
-}
-
-// MARK: - MealCard
-struct MealCard: View {
-    let title: String
-    let icon: String
-    let grams: Int
-    let calories: Int
-    
-    @EnvironmentObject var foodItemViewModel: FoodItemViewModel
-    
-    @State var openSheet = false
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(LinearGradient(colors: [Color.appSecondary.opacity(0.12), Color.appBlue.opacity(0.10)], startPoint: .top, endPoint: .bottomTrailing))
-                    .frame(width: 70, height: 70)
-                Image(icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 38, height: 38)
-            }
-            
-            VStack{
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(.primary)
-                Text("\(calories) cal")
-                    .font(.caption)
-                    .foregroundColor(.appSecondary)
-                Text("\(grams)g")
-                    .font(.caption)
-                    .foregroundColor(.appSecondary)
-            }
-        }
-        .sheet(isPresented: $openSheet) {
-            AddMeal().environmentObject(foodItemViewModel)
-        }
-        .onTapGesture {
-            openSheet = true
-            foodItemViewModel.selectedMeal = title
-        }
-        .frame(width: 80)
-    }
-}
-
-
-
-//#Preview {
-//    let mockContainer = try! ModelContainer(for: Meal.self) // only Meal needed for this view
-//    let mockViewModel = MealsViewModel(context: mockContainer.mainContext)
-//
-//    return DashboardView()
-//        .environmentObject(mockViewModel)
-//}
-//

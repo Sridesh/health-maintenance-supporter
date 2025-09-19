@@ -26,7 +26,7 @@ final class ActivityViewModel: ObservableObject {
     //MARK: -  Fetch today's activity
     @MainActor
     private func setupTodayActivity() {
-        print("Setting up today’s activity")
+        print("INFO: Setting up today’s activity")
         
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -35,18 +35,18 @@ final class ActivityViewModel: ObservableObject {
         formatter.dateFormat = "yyyy-MM-dd"
         let todayString = formatter.string(from: today)
         
-        print("Looking for activity with dateString: \(todayString)")
+        print("INFO: Looking for activity with dateString: \(todayString)")
         
-        // Fetch existing Activity record for today
+        //fetch existing record for today
         let fetchDescriptor = FetchDescriptor<Activity>(
             predicate: #Predicate<Activity> { $0.dateString == todayString }
         )
         
         if let existing = try? context.fetch(fetchDescriptor).first {
-            print("Found existing activity record for today")
+            print("SUCCESS: Found existing activity record for today")
             self.todayActivity = existing
         } else {
-            print("Creating new activity record for today")
+            print("INFO: Creating new activity record for today")
             
             let newActivity = Activity(date: today, steps: 0, distance: 0.0, burn: 0)
             context.insert(newActivity)
@@ -54,18 +54,17 @@ final class ActivityViewModel: ObservableObject {
             do {
                 try context.save()
                 self.todayActivity = newActivity
-                print("Successfully created and saved new activity record")
+                print("SUCCESS: Successfully created and saved new activity record")
             } catch {
-                print("Failed to save Activity: \(error)")
+                print("ERR: Failed to save Activity: \(error)")
             }
         }
     }
     
     //MARK: -  update activity
     func updateTodayActivity(steps: Int? = nil, distance: Double? = nil, burn: Int? = nil) {
-        print("Updating activity")
         guard let activity = todayActivity else {
-            print("No activity record found for today")
+            print("INFO: No activity record found for today")
             return
         }
         
@@ -86,11 +85,10 @@ final class ActivityViewModel: ObservableObject {
         
         do {
             try context.save()
-            print("Successfully updated today's activity")
-            // Notify SwiftUI that object changed
+            print("SUCCESS: Successfully updated today's activity")
             objectWillChange.send()
         } catch {
-            print("Failed to update today's activity: \(error)")
+            print("ERR: Failed to update today's activity: \(error)")
         }
     }
 }

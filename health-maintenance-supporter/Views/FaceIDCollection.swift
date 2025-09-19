@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FaceIDCollectionView: View {
     @EnvironmentObject var session: AuthenticationViewModel
+//    @EnvironmentObject var session: AuthenticationViewModelMock // for testing
     
     var body: some View {
         ZStack{

@@ -35,12 +35,12 @@ final class UserViewModel: ObservableObject {
             guard let self = self else { return }
             
             if let error = error {
-                print("Error fetching user: \(error.localizedDescription)")
+                print("ERR: Error fetching user: \(error.localizedDescription)")
                 return
             }
             
             guard let document = snapshot?.documents.first else {
-                print("No user found with email \(email)")
+                print("INFO: No user found with email \(email)")
                 DispatchQueue.main.async { self.userOnboarded = false }
                 return
             }
@@ -65,10 +65,9 @@ final class UserViewModel: ObservableObject {
                 self.currentUser = user
                 self.userOnboarded = true
                 
-                // Set the goal after updating currentUser
+                //set the goal after updating currentUser
                 if let goalId = user.goalId {
                     if let selectedPlan = fitnessPlans.first(where: { $0.id == goalId }) {
-                        print("Selected Plan: \(selectedPlan.goal)")
                         self.goal = selectedPlan
                     }
                 }
@@ -114,12 +113,12 @@ final class UserViewModel: ObservableObject {
                 ]
             
             if let document = snapshot?.documents.first {
-                // Update existing user
+                //update existing user
                 usersRef.document(document.documentID).setData(data, merge: true) { error in
                     if let error = error {
-                        print("Error updating user: \(error.localizedDescription)")
+                        print("ERR: Error updating user: \(error.localizedDescription)")
                     } else {
-                        print("User updated successfully")
+                        print("SUCCESS: User updated successfully")
                         DispatchQueue.main.async {
                             self.currentUser = user
                             self.userOnboarded = false
@@ -127,12 +126,12 @@ final class UserViewModel: ObservableObject {
                     }
                 }
             } else {
-                // Create new user
+                //create new user
                 usersRef.addDocument(data: data) { error in
                     if let error = error {
-                        print("Error creating user: \(error.localizedDescription)")
+                        print("ERR: Error creating user: \(error.localizedDescription)")
                     } else {
-                        print("User created successfully")
+                        print("SUCCESS: User created successfully")
                         DispatchQueue.main.async {
                             self.currentUser = user
                         }
@@ -150,20 +149,20 @@ final class UserViewModel: ObservableObject {
             guard let self = self else { return }
             
             if let error = error {
-                print("Error finding user: \(error.localizedDescription)")
+                print("ERR: Error finding user: \(error.localizedDescription)")
                 return
             }
             
             guard let document = snapshot?.documents.first else {
-                print("No user found with email \(email)")
+                print("DEBUG: No user found with email \(email)")
                 return
             }
             
             usersRef.document(document.documentID).updateData(newData) { error in
                 if let error = error {
-                    print("Error updating user: \(error.localizedDescription)")
+                    print("ERR: Error updating user: \(error.localizedDescription)")
                 } else {
-                    print("User updated successfully")
+                    print("SUCCESS: User updated successfully")
                     
                     DispatchQueue.main.async {
                         if self.currentUser.email == email {
@@ -183,60 +182,39 @@ final class UserViewModel: ObservableObject {
         }
     }
     
-//    func updateUserGoal(goalId: Int) {
-//        let email = self.currentUser.email
-//        let userRef = self.db.collection("Users").document(email)
-//
-//        userRef.updateData([
-//            "goalId": goalId
-//        ]) { error in
-//            if let error = error {
-//                print("Error updating goalId: \(error)")
-//            } else {
-//                DispatchQueue.main.async {
-//                    self.currentUser.goalId = goalId
-//                    print("goalId updated successfully in Firestor")
-//                }
-//            }
-//        }
-//    }
-    
     func updateUserGoal(goalId: Int) {
         let email = self.currentUser.email
         let usersRef = db.collection("Users")
         
-        // Query to find the document with the matching email (same pattern as your other methods)
+        //query to find document
         usersRef.whereField("email", isEqualTo: email).getDocuments { [weak self] snapshot, error in
             guard let self = self else { return }
             
             if let error = error {
-                print("Error finding user: \(error.localizedDescription)")
+                print("ERR: Error finding user: \(error.localizedDescription)")
                 return
             }
             
             guard let document = snapshot?.documents.first else {
-                print("No user found with email \(email)")
+                print("INFO: No user found with email \(email)")
                 return
             }
             
-            // Update the found document using its document ID
+            //update the found document using its document ID
             usersRef.document(document.documentID).updateData([
                 "goalId": goalId
             ]) { error in
                 if let error = error {
-                    print("Error updating goalId: \(error.localizedDescription)")
+                    print("ERR: Error updating goalId: \(error.localizedDescription)")
                 } else {
                     DispatchQueue.main.async {
                         self.currentUser.goalId = goalId
                         
-                        // Also update the goal object to keep UI in sync
                         if let selectedPlan = fitnessPlans.first(where: { $0.id == goalId }) {
                             self.goal = selectedPlan
                         } else {
                             self.goal = fitnessPlans[2]
                         }
-                        
-                        print("goalId updated successfully in Firestore")
                     }
                 }
             }
@@ -247,7 +225,6 @@ final class UserViewModel: ObservableObject {
         let email = self.currentUser.email
         let usersRef = db.collection("Users")
         
-        // Query to find the document with the matching email (same pattern as your other methods)
         usersRef.whereField("email", isEqualTo: email).getDocuments { [weak self] snapshot, error in
             guard let self = self else { return }
             
@@ -280,7 +257,7 @@ final class UserViewModel: ObservableObject {
     
     //MARK: - Reset on ogout
     func onLogout() {
-        // Reset all published properties
+        //reset
         currentUser = UserType(
             name: "",
             email: "",

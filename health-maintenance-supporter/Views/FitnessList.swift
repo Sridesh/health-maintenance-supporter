@@ -121,7 +121,6 @@ struct FitnessDetailView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    // Hero Title
                     Text(plan.goal)
                         .font(.largeTitle.bold())
                         .foregroundStyle(
@@ -132,7 +131,6 @@ struct FitnessDetailView: View {
                         .font(.callout)
                         .foregroundColor(.secondary)
                     
-                    // Daily Targets
                     GlassCard{
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Daily Targets")
@@ -202,14 +200,3 @@ struct FitnessDetailView: View {
     }
 }
 
-//struct FitnessListView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        FitnessListView()
-//    }
-//}
-//
-//struct FitnessDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        FitnessDetailView(plan: fitnessPlans.first!)
-//    }
-//}

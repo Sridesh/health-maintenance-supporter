@@ -1,4 +1,4 @@
-//
+///
 //  MealView.swift
 //  health-maintenance-supporter
 //
@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Mealiew:View {
     @EnvironmentObject var meal: MealsViewModel
+//    @EnvironmentObject var meal: MealsViewModelMock
         
         var totalCalories: Int {
             meal.totalCalories()
@@ -54,24 +55,6 @@ struct Mealiew:View {
                 }
                 .padding(.horizontal)
                 
-                // MARK: - Meal List
-//                ScrollView {
-//                    LazyVStack(spacing: 0) {
-//                        ForEach(meal.meals) { item in
-//                            IntakeItem(name: item.name, calCount: item.ckal, grams: item.grams)
-//                            
-//                            Divider()
-//                                .background(Color.gray.opacity(0.3))
-//                                .padding(.horizontal)
-//                        }
-//                    }
-//                    .background(Color.white)
-//                    .cornerRadius(20)
-//                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-//                    .padding(.horizontal)
-//                }
-//                
-//                Spacer()
             }
             .padding(.top)
             .background(Color.appSecondary.opacity(0.2))

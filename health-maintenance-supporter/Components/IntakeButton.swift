@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct IntakeButton: View {
     let title: String
     let color: Color

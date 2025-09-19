@@ -12,25 +12,24 @@ struct CircularProgress: View {
     public var fullAmount: Double
     public var amount: Double
     public var name: String
-    
-    /// Progress as a fraction (0 to 1)
+
     var progress: Double {
         fullAmount == 0 ? 0 : amount / fullAmount
     }
     
     var body: some View {
         ZStack {
-            // Background circle
+            //background circle
             Circle()
                 .stroke(color.opacity(0.1), lineWidth: 7)
             
-            // Progress circle
+            //foreground circle
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(color, style: StrokeStyle(lineWidth: 7, lineCap: .round))
-                .rotationEffect(.degrees(-90)) // start from top
+                .rotationEffect(.degrees(-90))
             
-            // Labels inside
+            //lbels
             VStack {
                 Text("\(String(format: "%.1f", amount))g")
                     .font(.system(size: 12))

@@ -57,6 +57,7 @@ struct health_maintenance_supporterApp: App {
         _userViewModel = StateObject(wrappedValue: userVM)
         
         BackupManager.shared.userViewModel = userVM
+        BackupManager.shared.context = modelContainer.mainContext
         
         let notificationService = NotificatioNService()
         _goalViewModel = StateObject(wrappedValue: GoalsViewModel(
@@ -73,7 +74,11 @@ struct health_maintenance_supporterApp: App {
     
     var body: some Scene {
         WindowGroup {
-
+            
+            if CommandLine.arguments.contains("test-ui"){
+                SignInView()
+                    .environmentObject(AuthenticationViewModelMock())
+            } else {
                 VStack{
                     
                     if showNextScreen{
@@ -112,37 +117,34 @@ struct health_maintenance_supporterApp: App {
                                 }
                             }
                     }
-            }.onAppear {
-                Auth.auth().addStateDidChangeListener { auth, user in
-                    if let email = user?.email {
-                        print("SUCCESS: \(email)")
-                        userViewModel.setMail(email: email)
-                        userViewModel.fetchUser(email: email)
-                        userViewModel.userName = user?.displayName ?? "Sridesh"
-                        authViewModel.userSessionLogged = true
-                        
-                        Task { @MainActor in
-                            activityViewModel.updateTodayActivity(
-                                steps: Int(healthStore.steps),
-                                distance: healthStore.distance,
-                                burn: Int(healthStore.activeCalories + healthStore.basalCalories)
-                            )
-                        }
-                        
-                        DailyReportManager.backupOldReports(context:self.container.mainContext, email: email) { res in
-                            print("Backup successful")
+                }.onAppear {
+                    Auth.auth().addStateDidChangeListener { auth, user in
+                        if let email = user?.email {
+                            print("SUCCESS: \(email)")
+                            userViewModel.setMail(email: email)
+                            userViewModel.fetchUser(email: email)
+                            userViewModel.userName = user?.displayName ?? "Sridesh"
+                            authViewModel.userSessionLogged = true
+                            
+                            Task { @MainActor in
+                                activityViewModel.updateTodayActivity(
+                                    steps: Int(healthStore.steps),
+                                    distance: healthStore.distance,
+                                    burn: Int(healthStore.activeCalories + healthStore.basalCalories)
+                                )
+                            }
+                            
+                            DailyReportManager.backupOldReports(context:self.container.mainContext, email: email) { res in
+                                print("Backup successful")
+                            }
                         }
                     }
+                    notificationService.scheduleWaterReminder()
+                    
                 }
-                notificationService.scheduleWaterReminder()
-                
             }
-
         }
     }
-    
-    
-
 }
 
 

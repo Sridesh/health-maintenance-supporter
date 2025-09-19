@@ -22,7 +22,7 @@ final class MealsViewModel: ObservableObject {
         
         dailyReport = DailyReportManager.getTodayReport(context: context)
         
-        // Setup today's meal list
+        //setup today's meal list
         setupTodayMealList()
     }
 
@@ -35,18 +35,18 @@ final class MealsViewModel: ObservableObject {
         formatter.dateFormat = "yyyy-MM-dd"
         let todayString = formatter.string(from: today)
         
-        print("Looking for meal list with dateString: \(todayString)")
+        print("INFO: Looking for meal list with dateString: \(todayString)")
         
-        // Fetch existing MealList for today
+        //fetch existing mealList for today
         let fetchDescriptor = FetchDescriptor<MealList>(
             predicate: #Predicate<MealList> { $0.dateString == todayString }
         )
         
         if let existing = try? context.fetch(fetchDescriptor).first {
             self.todayMealList = existing
-            print("Found existing meal list for today")
+            print("SUCCESS: Found existing meal list for today")
         } else {
-            print("Creating new meal list for today")
+            print("INFO: Creating new meal list for today")
             // Create default meals for today
             let defaultMeals = [
                 Meal(name: "Breakfast"),
@@ -55,17 +55,15 @@ final class MealsViewModel: ObservableObject {
                 Meal(name: "Snacks")
             ]
             
-            print("TODAY \(today)")
-            
             let newMealList = MealList(date: today, meals: defaultMeals)
             context.insert(newMealList)
             
             do {
                 try context.save()
                 self.todayMealList = newMealList
-                print("Successfully created and saved new meal list")
+                print("SUCCESS: Successfully created and saved new meal list")
             } catch {
-                print("Failed to save MealList: \(error)")
+                print("ERR: Failed to save MealList: \(error)")
             }
         }
     }
@@ -78,7 +76,7 @@ final class MealsViewModel: ObservableObject {
         meal.foodItems.append(food)
         context.insert(food)
         
-        dailyReport.calorieTotal += food.calories
+        dailyReport.calorieTotal += food.calories       //update adily report
             if let macros = food.macros {
                 dailyReport.macrosTotal.carbs += macros.carbs
                 dailyReport.macrosTotal.protein += macros.protein
@@ -97,7 +95,7 @@ final class MealsViewModel: ObservableObject {
         context.delete(food)
         
         
-        dailyReport.calorieTotal -= food.calories
+        dailyReport.calorieTotal -= food.calories       //update daily report
             if let macros = food.macros {
                 dailyReport.macrosTotal.carbs -= macros.carbs
                 dailyReport.macrosTotal.protein -= macros.protein
@@ -124,7 +122,7 @@ final class MealsViewModel: ObservableObject {
         do {
             try context.save()
         } catch {
-            print("Failed to save context: \(error)")
+            print("ERR: Failed to save context: \(error)")
         }
     }
     
@@ -160,12 +158,12 @@ final class MealsViewModel: ObservableObject {
         
         //MARK: - reset all data on logout
         func onLogout() {
-            //Fetch all MealList objects
+            //fetch all MealList objects
             let fetchMealLists = FetchDescriptor<MealList>()
             do {
                 let mealLists = try context.fetch(fetchMealLists)
                 
-                // Delete all MealLists
+                //aelete all MealLists
                 for mealList in mealLists {
                     context.delete(mealList)
                 }
@@ -193,10 +191,10 @@ final class MealsViewModel: ObservableObject {
                     taskCompletion: 0
                 )
                 
-                print("All meal data successfully deleted and ViewModel reset.")
+                print("SUCCESS: All meal data successfully deleted and ViewModel reset.")
                 
             } catch {
-                print("Failed to reset data: \(error)")
+                print("ERR: Failed to reset data: \(error)")
             }
         }
 

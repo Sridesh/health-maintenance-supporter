@@ -49,20 +49,20 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    //MARK: - face id checkå
-    func checkBiometricOnLaunch() {
-        // Fetch user with biometrics enabled
-        let descriptor = FetchDescriptor<User>(predicate: #Predicate { $0.isBiometricsAllowed == true })
-        
-        if let user = try? context.fetch(descriptor).first {
-            self.authenticateWithBiometrics()
-        } else {
-            self.error = "No user with biometrics enabled"
-            self.isAuthenticated = false
-            self.updateFlowState()
-        }
-    }
-    
+//    //MARK: - face id checkå
+//    func checkBiometricOnLaunch() {
+//        //fetch user
+//        let descriptor = FetchDescriptor<User>(predicate: #Predicate { $0.isBiometricsAllowed == true })
+//        
+//        if let user = try? context.fetch(descriptor).first {
+//            self.authenticateWithBiometrics()
+//        } else {
+//            self.error = "ERR: No user with biometrics enabled"
+//            self.isAuthenticated = false
+//            self.updateFlowState()
+//        }
+//    }
+//    
     //MARK: - Fetched logged user
     func fetchUser(){
         let descriptor = FetchDescriptor<User>()
@@ -77,29 +77,11 @@ final class AuthenticationViewModel: ObservableObject {
     // MARK: - Login Biometric
     
     func authenticateWithBiometrics() {
-        authService.authenticateWithBiometrics { [weak self] success, error in
+        authService.authenticateWithBiometrics { [weak self] success, error in      //faceID check
             guard let self = self else { return }
             
             if success {
-                // If user already exists in memory, trust it
-//                if self.user != nil {
-//                    self.isAuthenticated = true
-//                    self.updateFlowState()
-//                } else {
-//                    // Only fetch from context if user is nil
-//                    if let existingUser = try? self.context.fetch(
-//                        FetchDescriptor<User>(predicate: #Predicate { $0.isBiometricsAllowed == true })
-//                    ).first {
-//                        self.user = existingUser
-//                        self.isAuthenticated = true
-//                        self.updateFlowState()
-//                    } else {
-//                        self.error = "No user found with biometrics enabled"
-//                        self.isAuthenticated = false
-//                        self.updateFlowState()
-//                    }
-//                }
-                self.isAuthenticated = true
+                self.isAuthenticated = true     //successfully identified
             } else {
                 self.error = error ?? "Authentication failed"
                 self.isAuthenticated = false
@@ -109,41 +91,27 @@ final class AuthenticationViewModel: ObservableObject {
     }
 
     
-    // MARK: - User profile creation
-    
+    // MARK: - User profile creation on firebase
     func register(email: String, password: String) {
         firebaseService.FBRegister(email: email, password: password)
-        print("Resigtering in Firebase successful")
+        print("SUCCESS: Resigtering in Firebase successful")
     }
     
-    //MARK: - Logout
-    
+    //MARK: - Logout from firebase
     func logout(email:String){
-//        isAuthenticated = false
-//        updateFlowState()
-        
-//        let descriptor = FetchDescriptor<User>(predicate: #Predicate { $0.email == email })
-//        
-//        let user = try? context.fetch(descriptor).first
-//        user?.isActive = false
-//        
-//        try? context.save()
         firebaseService.FBLogout()
         self.userSessionLogged = false
     }
     
-    //MARK: - Login
-//    func login(email:String, password:String){
-//        firebaseService.FBLogin(email: email, password: password)
-//    }
+    //MARK: - Login to firebase
     @MainActor
     func login(email: String, password: String) async {
         do {
             let authResult = try await firebaseService.FBLogin(email: email, password: password)
-            print("Logged in: \(authResult.user.email ?? "unknown")")
+            print("SUCCESS: Logged in: \(authResult.user.email ?? "unknown")")
             self.loginError = false
         } catch {
-            print("Login failed: \(error.localizedDescription)")
+            print("ERR: Login failed: \(error.localizedDescription)")
             self.loginError = true
         }
     }

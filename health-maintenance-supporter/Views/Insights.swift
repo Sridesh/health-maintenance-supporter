@@ -22,10 +22,6 @@ struct InsightsView: View {
     
     @State var isAddIntakeOpen = false
     @State var customValue = ""
-    var waterProgress: CGFloat {
-        guard let dailyGoal = userViewModel.goal?.dailyTargets.water, dailyGoal > 0 else { return 0 }
-        return CGFloat(goalViewModel.waterIntake?.intake ?? 0 / dailyGoal)
-    }
     @State private var animateProgress = false
     
     private var byCategory: [NutritionCount] {
@@ -49,8 +45,7 @@ struct InsightsView: View {
             .ignoresSafeArea()
             
             
-            // MARK: - content
-
+            // MARK: - View content
                 VStack(spacing: 20) {
                     HStack{
                         
@@ -122,6 +117,7 @@ struct InsightsView: View {
                         }
                         
                         LastWeekInsights()
+                            .environmentObject(userViewModel)
                     }
                 }
                 .frame(maxHeight: .infinity, alignment: .top)

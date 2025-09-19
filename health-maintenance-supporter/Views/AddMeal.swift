@@ -17,15 +17,21 @@ struct AddMeal: View {
                             .padding(.bottom)
                     }
    
+                
+                
                 if !foodItemViewModel.searching {
                     VStack{
                         Divider()
                             .padding(.vertical)
                             .foregroundColor(Color.appPrimary)
                         
+                        
+                        //MARK: - AI Part
                         VStack{
                             Text("Identify nutritions with AI").font(.headline).frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
+                                
+                                //classification with camera taken image
                                 NavigationLink(destination: CameraClassificationView().environmentObject(foodItemViewModel)) {
                                     VStack {
                                         Image(systemName: "camera.fill")
@@ -43,6 +49,8 @@ struct AddMeal: View {
                                     .shadow(color: Color.appBackgound, radius: 10)
                                     .padding(.trailing)
                                 }
+                                
+                                //classification with uploaded image
                                 NavigationLink(destination: ClassificationWithVisionView().environmentObject(foodItemViewModel)){
                                     VStack {
                                         Image(systemName: "photo")
@@ -66,6 +74,7 @@ struct AddMeal: View {
                             .padding(.top)
                             .foregroundColor(Color.appPrimary)
                         
+                        //MARK: - Recently added food
                         VStack{
                             Text("Recent")
                                 .padding(10)

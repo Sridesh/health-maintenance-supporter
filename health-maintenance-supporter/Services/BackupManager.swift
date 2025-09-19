@@ -6,9 +6,11 @@
 //
 
 import Foundation
-import BackgroundTasks
 import FirebaseFirestore
+import BackgroundTasks
 import UIKit
+import SwiftData
+
 
 class BackupManager {
     static let shared = BackupManager()
@@ -18,11 +20,13 @@ class BackupManager {
     private var isBackgroundTaskAvailable = false
     
     var userViewModel: UserViewModel?
+    var context: ModelContext?
+    
+    private var healthStore = HealthStore()
     
     // MARK: - Register
     func registerBackgroundTask() {
         #if targetEnvironment(simulator)
-        print("INFO: Background tasks don't work properly on simulator")
         setupForegroundBackupFallback()
         return
         #endif
@@ -113,52 +117,54 @@ class BackupManager {
         }
     }
     
-    // MARK: - Upload Backup
-//    func uploadBackup(completion: @escaping (Bool) -> Void) {
-//        let db = Firestore.firestore()
-//        let backupData: [String: Any] = [
-//            "timestamp": Timestamp(),
-//            "data": "Example backup data",
-//            "backupType": isBackgroundTaskAvailable ? "background" : "foreground"
-//        ]
-//        
-//        db.collection("backups").addDocument(data: backupData) { error in
-//            if let error = error {
-//                print("ERR: Backup upload failed: \(error.localizedDescription)")
-//                completion(false)
-//            } else {
-//                print("SUCCESS: Backup uploaded successfully")
-//                completion(true)
-//            }
-//        }
-//    }
     
     // MARK: - Upload Backup
-    func uploadBackup(completion: @escaping (Bool) -> Void) {
-        Task { @MainActor in 
+    func uploadBackup(completion: @escaping (Bool) -> Void) {       // this background task will backup activity in the background
+        Task { @MainActor in
             guard let email = userViewModel?.currentUser.email, !email.isEmpty else {
                 print("ERR: No email available for backup ID")
                 completion(false)
                 return
             }
             
-            // Use today's date as string
+            // Use today's date
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
-            let todayString = formatter.string(from: Date())
+            let todayString : String = formatter.string(from: Date())
             
             let backupId = "\(todayString)-\(email)"
             
-            let db = Firestore.firestore()
-            let backupData: [String: Any] = [
-                "timestamp": Timestamp(),
-                "data": "Example backup data",
-                "backupType": isBackgroundTaskAvailable ? "background" : "foreground"
+            // Fetch today's report, or create a TEST one
+            guard let context = self.context else {
+                print("ERR: No context available for backup")
+                completion(false)
+                return
+            }
+            
+            
+            let report = DailyReportManager.getTodayReport(context: context) ?? DailyReport(date: Date(), calorieTotal: 0, stepsTotal: 0, waterTotal: 0, distanceTotal: 0, macrosTotal: Macro(carbs: 0, protein: 0, fats: 0), taskCompletion: 0)
+
+            let reportData: [String: Any] = [
+                "email": email,
+                "dateString": report.dateString,
+                "calorieTotal": report.calorieTotal,
+                "stepsTotal": healthStore.steps,
+                "waterTotal": report.waterTotal,
+                "distanceTotal": healthStore.distance,
+                "macrosTotal": [
+                    "carbs": report.macrosTotal.carbs,
+                    "protein": report.macrosTotal.protein,
+                    "fats": report.macrosTotal.fats
+                ],
+                "taskCompletion": report.taskCompletion,
+                "backupType": isBackgroundTaskAvailable ? "background" : "foreground",
+                "timestamp": Timestamp()
             ]
             
-            db.collection("backups")
-                .document(backupId) // <- unique doc per day/email
-                .setData(backupData, merge: true) { error in
+            let db = Firestore.firestore()
+            db.collection("dailyReports")
+                .document(backupId)
+                .setData(reportData, merge: true) { error in
                     if let error = error {
                         print("ERR: Backup upload failed: \(error.localizedDescription)")
                         completion(false)
@@ -169,6 +175,7 @@ class BackupManager {
                 }
         }
     }
+
 
     
     // MARK: - Utility Methods

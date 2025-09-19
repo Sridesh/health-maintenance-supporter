@@ -16,7 +16,6 @@ final class AuthenticationSerice{
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             
             var reason = "Authenticate to access your account"
-
                     context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
                                            localizedReason: reason) { success, authenticationError in
                         DispatchQueue.main.async {

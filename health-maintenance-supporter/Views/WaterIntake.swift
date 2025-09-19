@@ -13,6 +13,8 @@ struct WaterIntake: View {
     @EnvironmentObject var goalViewModel: GoalsViewModel
     @EnvironmentObject var userViewModel: UserViewModel
     
+//    @EnvironmentObject var userViewModel: UserViewModelMock // for testing
+    
     @State var isAddIntakeOpen = false
     @State var customValue = ""
     var waterProgress: CGFloat {
@@ -47,7 +49,7 @@ struct WaterIntake: View {
                 .padding(.bottom, 6)
                 
                 HStack(spacing: 24) {
-                    // Progress Circle
+                    //progress Circle
                     ZStack {
                         Circle()
                             .stroke(Color.appBlue.opacity(0.2), lineWidth: 12)
@@ -73,7 +75,7 @@ struct WaterIntake: View {
                     .onAppear { animateProgress = true }
                     .accessibilityLabel("Water intake")
                     
-                    // Intake Buttons
+                    //intake Buttons
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Next sip in 12 min")
                             .foregroundColor(Color.appPrimary)
